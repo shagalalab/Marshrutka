@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:marsh="http://schemas.android.com/apk/res-auto"
+    marsh:theme="@style/ActionBarThemeOverlay"
+    marsh:popupTheme="@style/ActionBarPopupThemeOverlay"
+    android:id="@+id/toolbar_actionbar"
+    android:background="@color/theme_primary"
+    marsh:titleTextAppearance="@style/ActionBar.TitleText"
+    marsh:contentInsetStart="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.Route;
+import com.shagalalab.marshrutka.db.DbHelper;
 
 /**
  * Created by aziz on 7/10/15.
@@ -28,13 +29,15 @@ public class QueryByNumberFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_query_by_number, null);
         mListView = (ListView)view.findViewById(android.R.id.list);
 
-        Route[] routes = generateMockRoutes();
-        QueryByNumberAdapter adapter = new QueryByNumberAdapter(getActivity(), 0, routes);
+        DbHelper dbHelper = new DbHelper(getActivity());
+        dbHelper.loadAllData();
+
+        QueryByNumberAdapter adapter = new QueryByNumberAdapter(getActivity(), 0, dbHelper.routes);
         mListView.setAdapter(adapter);
         return view;
     }
 
-    private Route[] generateMockRoutes() {
+    /*private Route[] generateMockRoutes() {
 
         DestinationPoint bazar = new DestinationPoint(1, "Орайлық базар");
         DestinationPoint goneqala = new DestinationPoint(2, "Гөне қала");
@@ -58,7 +61,10 @@ public class QueryByNumberFragment extends Fragment {
                 new Route(true, 7, oraqbalga, qizketken, null),
                 new Route(true, 15, oraqbalga, bazar, vokzal),
                 new Route(false, 1, vokzal, oraqbalga, null),
+                new Route(false, 5, bazar, goneqala, null),
                 new Route(false, 7, bazar, qumawil, null),
+                new Route(false, 8, allaniyazqaxarman, roddom, null),
+                new Route(false, 10, vokzal, samanbay, null),
                 new Route(false, 12, bazar, qizketken, null),
                 new Route(false, 16, vokzal, allaniyazqaxarman, null),
                 new Route(false, 41, bazar, vokzal, askeriyGarnizon),
@@ -70,7 +76,7 @@ public class QueryByNumberFragment extends Fragment {
         };
         return routes;
     }
-
+*/
     private class QueryByNumberAdapter extends ArrayAdapter<Route> {
 
         private LayoutInflater mInflater;

@@ -11,6 +11,8 @@ public class Route {
     public DestinationPoint pointB;
     public DestinationPoint pointC;
 
+    public Route() {}
+
     public Route(boolean isBus,
                  int displayNo,
                  DestinationPoint pointA,

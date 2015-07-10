@@ -140,8 +140,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
     /**
      * Set the custom layout to be inflated for the tab views.
      *
-     * @param layoutResId Layout id to be inflated
-     * @param textViewId  id of the {@link TextView} in the inflated view
+     * @param layoutResId Layout ID to be inflated
+     * @param textViewId  ID of the {@link TextView} in the inflated view
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;
@@ -195,7 +195,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             TextView tabTitleView = null;
 
             if (mTabViewLayoutId != 0) {
-                // If there is a custom tab view layout id set, try and inflate it
+                // If there is a custom tab view layout ID set, try and inflate it
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
                         false);
                 tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);

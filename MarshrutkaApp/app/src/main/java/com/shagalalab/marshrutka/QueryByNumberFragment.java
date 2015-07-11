@@ -29,10 +29,9 @@ public class QueryByNumberFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_query_by_number, null);
         mListView = (ListView)view.findViewById(android.R.id.list);
 
-        DbHelper dbHelper = new DbHelper(getActivity());
-        dbHelper.loadAllData();
+        DbHelper dbHelper = DbHelper.getInstance(getActivity());
 
-        QueryByNumberAdapter adapter = new QueryByNumberAdapter(getActivity(), 0, dbHelper.routes);
+        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, dbHelper.routes);
         mListView.setAdapter(adapter);
         return view;
     }
@@ -77,44 +76,4 @@ public class QueryByNumberFragment extends Fragment {
         return routes;
     }
 */
-    private class QueryByNumberAdapter extends ArrayAdapter<Route> {
-
-        private LayoutInflater mInflater;
-
-        public QueryByNumberAdapter(Context context, int resource, Route[] objects) {
-            super(context, resource, objects);
-            mInflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.query_list_item, null);
-                holder = new ViewHolder();
-                holder.txtTransportNo = (TextView)convertView.findViewById(R.id.txt_transport_no);
-                holder.pointA = (TextView)convertView.findViewById(R.id.txt_pointA);
-                holder.pointB = (TextView)convertView.findViewById(R.id.txt_pointB);
-                holder.pointC = (TextView)convertView.findViewById(R.id.txt_pointC);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder)convertView.getTag();
-            }
-            Route route = getItem(position);
-            holder.txtTransportNo.setText((route.isBus ? "АВ-" : "") + route.displayNo);
-            holder.pointA.setText(route.pointA.name);
-            holder.pointB.setText(route.pointB.name);
-            if (route.pointC == null) {
-                holder.pointC.setVisibility(View.GONE);
-            } else {
-                holder.pointC.setVisibility(View.VISIBLE);
-                holder.pointC.setText(route.pointC.name);
-            }
-            return convertView;
-        }
-    }
-
-    private class ViewHolder {
-        TextView txtTransportNo, pointA, pointB, pointC;
-    }
 }

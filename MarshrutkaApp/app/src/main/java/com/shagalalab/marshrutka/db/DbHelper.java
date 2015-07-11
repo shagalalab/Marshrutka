@@ -55,10 +55,20 @@ public class DbHelper extends SQLiteOpenHelper {
      *
      * @param context
      */
-    public DbHelper(Context context) {
+    DbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         this.mContext = context;
         DB_PATH = String.format("/data/data/%s/databases/", context.getPackageName());
+    }
+
+    private static DbHelper _instance;
+
+    public static DbHelper getInstance(Context context) {
+        if (_instance == null) {
+            _instance = new DbHelper(context);
+            _instance.loadAllData();
+        }
+        return _instance;
     }
 
     /**
@@ -148,7 +158,7 @@ public class DbHelper extends SQLiteOpenHelper {
     // You could return cursors by doing "return mDataBase.query(....)" so it'd be easy
     // to you to create adapters for your views.
 
-    public void loadAllData() {
+    private void loadAllData() {
         if (routes != null && destinationPoints != null && reverseRoutes != null) {
             // nothing to do
             return;

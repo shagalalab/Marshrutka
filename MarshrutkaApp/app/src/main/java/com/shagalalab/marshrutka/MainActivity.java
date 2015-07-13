@@ -38,15 +38,17 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-    private static final String[] TAB_NAMES = new String[] {
-            "№",
-            "А -> Б"
-    };
+    private String[] TAB_NAMES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TAB_NAMES = new String[] {
+                getString(R.string.tab_text_numero_sign),
+                getString(R.string.tab_text_from_to)
+        };
 
         // Set up toolbar.
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);

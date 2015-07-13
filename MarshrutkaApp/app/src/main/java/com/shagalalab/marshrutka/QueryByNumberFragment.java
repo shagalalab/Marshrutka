@@ -33,6 +33,7 @@ public class QueryByNumberFragment extends Fragment {
 
         DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, dbHelper.routes);
         mListView.setAdapter(adapter);
+        mListView.setFastScrollEnabled(true);
         return view;
     }
 

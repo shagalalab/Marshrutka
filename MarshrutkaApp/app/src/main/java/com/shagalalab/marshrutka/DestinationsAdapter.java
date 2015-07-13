@@ -5,20 +5,46 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.shagalalab.marshrutka.data.Route;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 /**
  * Created by aziz on 7/11/15.
  */
-public class DestinationsAdapter extends ArrayAdapter<Route> {
+public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionIndexer {
 
     private LayoutInflater mInflater;
+    private String[] sections;
+    private LinkedHashMap<String, Integer> sectionIndexer;
 
     public DestinationsAdapter(Context context, int resource, Route[] objects) {
         super(context, resource, objects);
         mInflater = LayoutInflater.from(context);
+
+        int len = objects.length;
+        sectionIndexer = new LinkedHashMap<String, Integer>();
+        for (int i=0; i<len; i++) {
+            Route current = objects[i];
+            if (current.isBus) {
+                if (current.displayNo == 1) {
+                    sectionIndexer.put("АВ-1", i);
+                } else if (current.displayNo == 10) {
+                    sectionIndexer.put("АВ-10", i);
+                }
+            } else {
+                if (current.displayNo == 1 || current.displayNo % 10 == 0) {
+                    sectionIndexer.put(Integer.toString(current.displayNo), i);
+                }
+            }
+        }
+        sections = new String[sectionIndexer.size()];
+        sections = new ArrayList<String>(sectionIndexer.keySet()).toArray(sections);
     }
 
     @Override
@@ -50,5 +76,20 @@ public class DestinationsAdapter extends ArrayAdapter<Route> {
 
     private class ViewHolder {
         TextView txtTransportNo, pointA, pointB, pointC;
+    }
+
+    @Override
+    public Object[] getSections() {
+        return sections;
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return 0;
+    }
+
+    @Override
+    public int getPositionForSection(int section) {
+        return sectionIndexer.get(sections[section]);
     }
 }

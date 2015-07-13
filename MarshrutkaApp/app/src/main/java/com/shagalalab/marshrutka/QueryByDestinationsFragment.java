@@ -43,7 +43,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
 
         mDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
         Collections.sort(mDestinationPoints);
-        mDestinationPoints.add(0, new DestinationPoint(-1, " ---- Мәнзилди сайлаң ---- "));
+        mDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
 
         mStartPoint = (Spinner)view.findViewById(R.id.spinner_start_point);
         mEndPoint = (Spinner)view.findViewById(R.id.spinner_end_point);

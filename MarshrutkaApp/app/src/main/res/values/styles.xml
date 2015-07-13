@@ -5,14 +5,7 @@
         <item name="colorPrimary">@color/theme_primary</item>
         <item name="colorPrimaryDark">@color/theme_primary_dark</item>
         <item name="colorAccent">@color/theme_accent_2</item>
-
         <item name="android:textColorLink">@color/theme_accent_2</item>
-        <!--
-                <item name="windowActionBar">false</item>
-
-                <item name="android:windowNoTitle">true</item>
-        -->
-
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@android:color/white</item>
     </style>
@@ -31,6 +24,14 @@
     <style name="DestionationPointText">
         <item name="android:textSize">16sp</item>
         <item name="android:padding">3dp</item>
+    </style>
+
+    <style name="QueryByDestinationLabelText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">3dp</item>
+    </style>
+
+    <style name="ListFastScrollStyle">
     </style>
 
 </resources>

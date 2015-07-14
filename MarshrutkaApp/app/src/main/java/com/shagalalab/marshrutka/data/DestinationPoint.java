@@ -51,11 +51,13 @@ public class DestinationPoint implements Comparable<DestinationPoint> {
                 return thisChar - (int)'а';
             } else if (thatIndex == null) {
                 return (int)'а' - thatChar;
+            } else if (thatIndex.equals(thisIndex)) {
+                continue;
             } else {
                 return thisIndex - thatIndex;
             }
         }
-        return this.compareTo(that);
+        return this.name.compareTo(that.name);
     }
 
     @Override
@@ -66,26 +68,5 @@ public class DestinationPoint implements Comparable<DestinationPoint> {
 
         DestinationPoint thatPoint = (DestinationPoint)that;
         return this.ID == thatPoint.ID && this.name.equals(thatPoint.name);
-    }
-
-    public static void main(String[] args) {
-        DestinationPoint p1 = new DestinationPoint(0, "Әжинияз");
-        DestinationPoint p2 = new DestinationPoint(0, "Қосыбай");
-        DestinationPoint p3 = new DestinationPoint(0, "Амангелди");
-        DestinationPoint p4 = new DestinationPoint(0, "Буўрабай");
-        DestinationPoint p5 = new DestinationPoint(0, "Камал");
-        DestinationPoint p6 = new DestinationPoint(0, "Ғалым");
-        DestinationPoint p7 = new DestinationPoint(0, "Ганс");
-        DestinationPoint p8 = new DestinationPoint(0, "Дәрьябай");
-        DestinationPoint p9 = new DestinationPoint(0, "Юра");
-
-        assert p1.compareTo(p3) > 0;
-        assert p1.compareTo(p4) < 0;
-        assert p1.compareTo(p7) < 0;
-        assert p2.compareTo(p5) > 0;
-        assert p2.compareTo(p9) < 0;
-        assert p6.compareTo(p8) < 0;
-        assert p6.compareTo(p7) > 0;
-        assert p9.compareTo(p6) > 0;
     }
 }

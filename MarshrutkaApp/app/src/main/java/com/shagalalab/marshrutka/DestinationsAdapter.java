@@ -33,9 +33,7 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
             Route current = objects[i];
             if (current.isBus) {
                 if (current.displayNo == 1) {
-                    sectionIndexer.put("АВ-1", i);
-                } else if (current.displayNo == 10) {
-                    sectionIndexer.put("АВ-10", i);
+                    sectionIndexer.put("АВ", i);
                 }
             } else {
                 if (current.displayNo == 1 || current.displayNo % 10 == 0) {

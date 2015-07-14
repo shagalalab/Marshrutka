@@ -1,13 +1,16 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/theme_primary</item>
         <item name="colorPrimaryDark">@color/theme_primary_dark</item>
         <item name="colorAccent">@color/theme_accent_2</item>
         <item name="android:textColorLink">@color/theme_accent_2</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@android:color/white</item>
+    </style>
+    <style name="AppTheme" parent="AppTheme.Base">
+
     </style>
     <style name="TabIndicator" parent="ActionBarThemeOverlay"/>
     <style name="ActionBarThemeOverlay" parent="">

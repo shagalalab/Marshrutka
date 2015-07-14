@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="AppTheme.Base">
+        <item name="android:fastScrollOverlayPosition">atThumb</item>
+        <item name="android:fastScrollTrackDrawable">@drawable/fastscroll_track</item>
+        <item name="android:fastScrollThumbDrawable">@drawable/fastscroll_thumb</item>
+        <item name="android:fastScrollPreviewBackgroundRight">@drawable/fastscroll_label_right</item>
+    </style>
+</resources>

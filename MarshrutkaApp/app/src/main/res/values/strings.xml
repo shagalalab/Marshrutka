@@ -14,4 +14,5 @@
 
     <string name="type_of_transport_bus">Автобус</string>
     <string name="type_of_transport_marshrutka">Маршрутка</string>
+    <string name="no_destinations_found_by_given_route">Берилген мәнзиллер бойынша маршрутка ямаса автобус жөнелиси табылмады.</string>
 </resources>

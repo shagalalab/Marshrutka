@@ -33,12 +33,15 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
     ArrayList<DestinationPoint> mDestinationPoints;
     DbHelper mDbHelper;
     Spinner mStartPoint, mEndPoint;
+    private View mEmptyView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_query_by_destination, null);
         mListView = (ListView) view.findViewById(android.R.id.list);
+        mEmptyView = view.findViewById(android.R.id.empty);
+
 
         mDbHelper = DbHelper.getInstance(getActivity());
 
@@ -59,6 +62,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
 
         mStartPoint.setOnItemSelectedListener(this);
         mEndPoint.setOnItemSelectedListener(this);
+
 
         return view;
     }
@@ -87,6 +91,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
             filteredRoutes[i] = mDbHelper.routes[routeIds[i] - 1];
         }
         DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
+        mListView.setEmptyView(mEmptyView);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

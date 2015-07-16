@@ -6,4 +6,12 @@
     <string name="choose_destination"> ---- Мәнзилди сайлаң ---- </string>
     <string name="tab_text_numero_sign">№</string>
     <string name="tab_text_from_to">А -> Б</string>
+    <string name="title_activity_detail">DetailActivity</string>
+
+    <string name="type_of_transport">Транспорт түри:</string>
+    <string name="transport_number">Жөнелис номери:</string>
+    <string name="destinations">Мәнзиллер:</string>
+
+    <string name="type_of_transport_bus">Автобус</string>
+    <string name="type_of_transport_marshrutka">Маршрутка</string>
 </resources>

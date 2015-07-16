@@ -1,6 +1,7 @@
 package com.shagalalab.marshrutka;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_query_by_destination, null);
-        mListView = (ListView)view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
 
         mDbHelper = DbHelper.getInstance(getActivity());
 
@@ -45,8 +46,8 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         Collections.sort(mDestinationPoints);
         mDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
 
-        mStartPoint = (Spinner)view.findViewById(R.id.spinner_start_point);
-        mEndPoint = (Spinner)view.findViewById(R.id.spinner_end_point);
+        mStartPoint = (Spinner) view.findViewById(R.id.spinner_start_point);
+        mEndPoint = (Spinner) view.findViewById(R.id.spinner_end_point);
 
         DestinationPointsAdapter startPointAdapter = new DestinationPointsAdapter(getActivity(),
                 0, mDestinationPoints);
@@ -73,20 +74,28 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         if (startPointID == -1 && endPointID == -1) {
             return;
         } else if (startPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[endPointID-1].routeIds;
+            routeIds = mDbHelper.reverseRoutes[endPointID - 1].routeIds;
         } else if (endPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[startPointID-1].routeIds;
+            routeIds = mDbHelper.reverseRoutes[startPointID - 1].routeIds;
         } else {
             routeIds = mergeRoutes(mDbHelper.reverseRoutes[endPointID - 1].routeIds,
                     mDbHelper.reverseRoutes[startPointID - 1].routeIds);
         }
         int routesCount = routeIds.length;
-        Route[] filteredRoutes = new Route[routesCount];
-        for (int i=0; i<routesCount; i++) {
-            filteredRoutes[i] = mDbHelper.routes[routeIds[i]-1];
+        final Route[] filteredRoutes = new Route[routesCount];
+        for (int i = 0; i < routesCount; i++) {
+            filteredRoutes[i] = mDbHelper.routes[routeIds[i] - 1];
         }
         DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
         mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(DetailActivity.ROUTE_ID, filteredRoutes[position].ID-1);
+                startActivity(intent);
+            }
+        });
     }
 
     private int[] mergeRoutes(int[] routeIds1, int[] routeIds2) {
@@ -108,7 +117,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         }
         int mergedSize = merged.size();
         int[] mergedRoutes = new int[mergedSize];
-        for (int i=0; i<mergedSize; i++) {
+        for (int i = 0; i < mergedSize; i++) {
             mergedRoutes[i] = merged.get(i);
         }
         return mergedRoutes;
@@ -121,6 +130,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
 
     private class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> {
         LayoutInflater mInflater;
+
         public DestinationPointsAdapter(Context context, int resource, List<DestinationPoint> objects) {
             super(context, resource, objects);
             mInflater = LayoutInflater.from(context);
@@ -131,7 +141,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
                 convertView = mInflater.inflate(android.R.layout.simple_list_item_1, null);
             }
 
-            ((TextView)convertView).setText(getItem(position).name);
+            ((TextView) convertView).setText(getItem(position).name);
             return convertView;
         }
 

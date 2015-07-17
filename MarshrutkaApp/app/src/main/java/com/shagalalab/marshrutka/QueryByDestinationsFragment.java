@@ -15,7 +15,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.shagalalab.marshrutka.data.DestinationPoint;
-import com.shagalalab.marshrutka.data.ReverseRoute;
 import com.shagalalab.marshrutka.data.Route;
 import com.shagalalab.marshrutka.db.DbHelper;
 
@@ -33,7 +32,8 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
     ArrayList<DestinationPoint> mDestinationPoints;
     DbHelper mDbHelper;
     Spinner mStartPoint, mEndPoint;
-    private View mEmptyView;
+    private View mEmptyView, mClearedView;
+    private DestinationsAdapter adapter;
 
     @Nullable
     @Override
@@ -41,7 +41,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         View view = inflater.inflate(R.layout.fragment_query_by_destination, null);
         mListView = (ListView) view.findViewById(android.R.id.list);
         mEmptyView = view.findViewById(android.R.id.empty);
-
+        mClearedView = view.findViewById(R.id.clear_list);
 
         mDbHelper = DbHelper.getInstance(getActivity());
 
@@ -76,6 +76,11 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         int[] routeIds;
 
         if (startPointID == -1 && endPointID == -1) {
+            if (adapter != null) {
+                adapter = new DestinationsAdapter(getActivity(), 0, new Route[0]);
+                mListView.setEmptyView(mClearedView);
+                mListView.setAdapter(adapter);
+            }
             return;
         } else if (startPointID == -1) {
             routeIds = mDbHelper.reverseRoutes[endPointID - 1].routeIds;
@@ -90,7 +95,7 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         for (int i = 0; i < routesCount; i++) {
             filteredRoutes[i] = mDbHelper.routes[routeIds[i] - 1];
         }
-        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
+        adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
         mListView.setEmptyView(mEmptyView);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

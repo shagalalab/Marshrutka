@@ -22,8 +22,8 @@ def createDb(dbfilename):
 	c.execute('''CREATE TABLE reverseroutes (destinationId integer, routeIds text)''')
 	print "'reverseroutes' table is created"
 
-	c.execute('''CREATE TABLE reachibledestinations (destinationId integer, reachibleDestinationIds text)''')
-	print "'reachibledestinations' table is created"
+	c.execute('''CREATE TABLE reachabledestinations (destinationId integer, reachableDestinationIds text)''')
+	print "'reachabledestinations' table is created"
 
 	# for use in android
 	c.execute('''CREATE TABLE "android_metadata" ("locale" TEXT DEFAULT 'en_US')''')
@@ -127,14 +127,14 @@ def fillDb(dbfilename, csvfile):
 			print destId, ','.join(routeIds)
 
 		printLines()
-		print "reachible destinations"
+		print "reachable destinations"
 		printLines()
 		for destId in reachibledestinations.keys():
 			# remove self
 			reachibledestinations[destId] -= set([destId])
 
 			reachibledestinationIds = map(str, reachibledestinations[destId])
-			c.execute('''INSERT INTO reachibledestinations (destinationId, reachibleDestinationIds)
+			c.execute('''INSERT INTO reachabledestinations (destinationId, reachableDestinationIds)
 						 VALUES (?, ?)''', (destId, ','.join(reachibledestinationIds)))
 			print destId, ','.join(reachibledestinationIds)
 			
@@ -270,7 +270,7 @@ def printReachibleDestinations(dbfilename):
 	conn.close()
 
 def getReachibleDestIds(cursor, destId):
-	cursor.execute("SELECT reachibleDestinationIds from reachibledestinations where destinationId = ?", (destId, ))
+	cursor.execute("SELECT reachableDestinationIds from reachabledestinations where destinationId = ?", (destId, ))
 	return cursor.fetchone()[0]
 
 def printDestinationsById(points, destIdList):
@@ -283,7 +283,6 @@ def getDestIdByName(cursor, name):
 	cursor.execute("SELECT id FROM destinations WHERE name = ?", [name])
 	return cursor.fetchone()[0]
 
-"""points array is indexed from 0, but _id in destinations starts from 1"""
 def getAllDestinationPoints(cursor):
 	cursor.execute("SELECT name FROM destinations")
 	rows = cursor.fetchall()

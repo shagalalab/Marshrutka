@@ -5,8 +5,10 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.shagalalab.marshrutka.data.DestinationPoint;
+import com.shagalalab.marshrutka.data.ReachableDestinations;
 import com.shagalalab.marshrutka.data.ReverseRoute;
 import com.shagalalab.marshrutka.data.Route;
 
@@ -17,27 +19,32 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class DbHelper extends SQLiteOpenHelper {
+    private static final String TAG = "marshrutka";
 
-    public static final String TABLE_ROUTES = "routes";
-    public static final String COLUMN_ROUTES_ID = "_id";
-    public static final String COLUMN_ROUTES_TYPE = "type";
-    public static final String COLUMN_ROUTES_DISPLAYNO = "displaynumber";
-    public static final String COLUMN_ROUTES_POINTA = "pointA";
-    public static final String COLUMN_ROUTES_POINTB = "pointB";
-    public static final String COLUMN_ROUTES_POINTC = "pointC";
+    private static final String TABLE_ROUTES = "routes";
+    private static final String COLUMN_ROUTES_ID = "id";
+    private static final String COLUMN_ROUTES_TYPE = "type";
+    private static final String COLUMN_ROUTES_DISPLAYNO = "displaynumber";
+    private static final String COLUMN_ROUTES_POINTA = "pointA";
+    private static final String COLUMN_ROUTES_POINTB = "pointB";
+    private static final String COLUMN_ROUTES_POINTC = "pointC";
 
-    public static final String TABLE_DESTINATIONS = "destinations";
-    public static final String COLUMN_DESTINATIONS_ID = "_id";
-    public static final String COLUMN_DESTINATIONS_NAME = "name";
+    private static final String TABLE_DESTINATIONS = "destinations";
+    private static final String COLUMN_DESTINATIONS_ID = "id";
+    private static final String COLUMN_DESTINATIONS_NAME = "name";
 
-    public static final String TABLE_REVERSEROUTES = "reverseroutes";
-    public static final String COLUMN_REVERSEROUTES_ID = "_id";
-    public static final String COLUMN_REVERSEROUTES_DESTIONATIONID = "destinationId";
-    public static final String COLUMN_REVERSEROUTES_ROUTEIDS = "routeIds";
+    private static final String TABLE_REVERSEROUTES = "reverseroutes";
+    private static final String COLUMN_REVERSEROUTES_DESTIONATIONID = "destinationId";
+    private static final String COLUMN_REVERSEROUTES_ROUTEIDS = "routeIds";
+
+    private static final String TABLE_REACHABLEDESTINATIONS = "reachabledestinations";
+    private static final String COLUMN_REACHABLEDESTINATIONS_DESTINATIONID = "destinationId";
+    private static final String COLUMN_REACHABLEDESTINATIONS_REACHABLEDESTINATIONIDS = "reachableDestinationIds";
 
     public DestinationPoint[] destinationPoints;
     public ReverseRoute[] reverseRoutes;
     public Route[] routes;
+    public ReachableDestinations[] reachableDestinations;
 
     //The Android's default system path of your application database.
     private final String DB_PATH;
@@ -91,6 +98,13 @@ public class DbHelper extends SQLiteOpenHelper {
             } catch (IOException e) {
                 throw new Error("Error copying database");
             }
+        }
+    }
+
+    private void removeObsoleteDatabase() {
+        File dbfile = new File(DB_PATH + DB_NAME);
+        if (dbfile.exists()) {
+            dbfile.delete();
         }
     }
 
@@ -148,10 +162,18 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d(TAG, "DbHelper.onCreate()");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, "DbHelper.onUpgrade() oldVersion="+oldVersion+", newVersion="+newVersion);
+        removeObsoleteDatabase();
+        try {
+            createDataBaseIfNotExists();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Add your public helper methods to access and get content from the database.
@@ -170,6 +192,7 @@ public class DbHelper extends SQLiteOpenHelper {
             loadDestinationPoints();
             loadRoutes();
             loadReverseRoutes();
+            loadReachableDestinations();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -195,14 +218,14 @@ public class DbHelper extends SQLiteOpenHelper {
             route.displayNo = cursor.getInt(2);
             // Be careful, IDs in DB start from 1, while we will access destinationPoints
             // by array index that start from 0
-            route.pointA = destinationPoints[cursor.getInt(3)-1];
-            route.pointB = destinationPoints[cursor.getInt(4)-1];
+            route.pointA = destinationPoints[cursor.getInt(3)];
+            route.pointB = destinationPoints[cursor.getInt(4)];
             int pointC = cursor.getInt(5);
             if (pointC != -1) {
-                route.pointC = destinationPoints[cursor.getInt(5) - 1];
+                route.pointC = destinationPoints[cursor.getInt(5)];
             }
 
-            routes[route.ID-1] = route;
+            routes[route.ID] = route;
         }
         cursor.close();
     }
@@ -221,7 +244,7 @@ public class DbHelper extends SQLiteOpenHelper {
             DestinationPoint destinationPoint = new DestinationPoint(ID, name);
             // Be careful, IDs in DB start from 1, while we will access destinationPoints
             // by array index that start from 0
-            destinationPoints[ID-1] = destinationPoint;
+            destinationPoints[ID] = destinationPoint;
         }
         cursor.close();
     }
@@ -238,9 +261,27 @@ public class DbHelper extends SQLiteOpenHelper {
             int destinationID = cursor.getInt(0);
             String routeIds = cursor.getString(1);
             ReverseRoute reverseRoute = new ReverseRoute(destinationID, routeIds);
-            reverseRoutes[destinationID-1] = reverseRoute;
+            reverseRoutes[destinationID] = reverseRoute;
         }
         cursor.close();
+    }
+
+    private void loadReachableDestinations() {
+        int count = getCount(TABLE_REACHABLEDESTINATIONS);
+        reachableDestinations = new ReachableDestinations[count];
+        Cursor cursor = mDataBase.query(TABLE_REACHABLEDESTINATIONS,
+                new String[]{
+                        COLUMN_REACHABLEDESTINATIONS_DESTINATIONID,
+                        COLUMN_REACHABLEDESTINATIONS_REACHABLEDESTINATIONIDS
+                }, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            int destinationID = cursor.getInt(0);
+            String reachableDestinationIds = cursor.getString(1);
+            ReachableDestinations reachableDestination = new ReachableDestinations(destinationID, reachableDestinationIds);
+            reachableDestinations[destinationID] = reachableDestination;
+        }
+        cursor.close();
+
     }
 
     private int getCount(String tableName) {

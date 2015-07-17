@@ -61,7 +61,6 @@ public class PathDrawer extends View {
             int top = textView.getTop();
             int bottom = textView.getBottom();
             mPoints.add(new Point(getMeasuredWidth()/2, (top + bottom) / 2));
-            String ss = "";
         }
     }
 

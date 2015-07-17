@@ -12,5 +12,5 @@
 
     <color name="theme_accent_2">#e91e63</color>
 
-    <color name="text_color">#263238</color>
+    <color name="list_item_text_color">#263238</color>
 </resources>

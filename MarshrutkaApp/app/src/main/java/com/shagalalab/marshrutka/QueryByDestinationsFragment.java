@@ -26,86 +26,115 @@ import java.util.List;
 /**
  * Created by aziz on 7/10/15.
  */
-public class QueryByDestinationsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class QueryByDestinationsFragment extends Fragment {
 
     private ListView mListView;
-    ArrayList<DestinationPoint> mDestinationPoints;
+    ArrayList<DestinationPoint> mStartDestinationPoints, mEndDestinationPoints;
     DbHelper mDbHelper;
     Spinner mStartPoint, mEndPoint;
-    private View mEmptyView, mClearedView;
-    private DestinationsAdapter adapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_query_by_destination, null);
         mListView = (ListView) view.findViewById(android.R.id.list);
-        mEmptyView = view.findViewById(android.R.id.empty);
-        mClearedView = view.findViewById(R.id.clear_list);
 
         mDbHelper = DbHelper.getInstance(getActivity());
 
-        mDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
-        Collections.sort(mDestinationPoints);
-        mDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
+        mStartDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
+        Collections.sort(mStartDestinationPoints);
+        mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
 
         mStartPoint = (Spinner) view.findViewById(R.id.spinner_start_point);
         mEndPoint = (Spinner) view.findViewById(R.id.spinner_end_point);
 
         DestinationPointsAdapter startPointAdapter = new DestinationPointsAdapter(getActivity(),
-                0, mDestinationPoints);
-        DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
-                0, mDestinationPoints);
+                0, mStartDestinationPoints);
 
         mStartPoint.setAdapter(startPointAdapter);
-        mEndPoint.setAdapter(endPointAdapter);
 
-        mStartPoint.setOnItemSelectedListener(this);
-        mEndPoint.setOnItemSelectedListener(this);
-
+        mStartPoint.setOnItemSelectedListener(new StartPointItemSelectedListener());
+        mEndPoint.setOnItemSelectedListener(new EndPointItemSelectedListener());
 
         return view;
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-        int startPointPosition = mStartPoint.getSelectedItemPosition();
-        int endPointPosition = mEndPoint.getSelectedItemPosition();
-        int startPointID = mDestinationPoints.get(startPointPosition).ID;
-        int endPointID = mDestinationPoints.get(endPointPosition).ID;
-        int[] routeIds;
+    private class StartPointItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
-        if (startPointID == -1 && endPointID == -1) {
-            if (adapter != null) {
-                adapter = new DestinationsAdapter(getActivity(), 0, new Route[0]);
-                mListView.setEmptyView(mClearedView);
-                mListView.setAdapter(adapter);
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+            int startPointPosition = mStartPoint.getSelectedItemPosition();
+            int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
+            if (startPointID == -1) {
+                mEndPoint.setAdapter(null);
+                mListView.setAdapter(null);
+            } else {
+                mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[startPointID].reachableDestinationIds);
+                DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
+                        0, mEndDestinationPoints);
+                mEndPoint.setAdapter(endPointAdapter);
+                setListAdapter();
             }
-            return;
-        } else if (startPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[endPointID - 1].routeIds;
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+        }
+    }
+
+    private class EndPointItemSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+            setListAdapter();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+        }
+    }
+
+    private void setListAdapter() {
+        int startPointPosition = mStartPoint.getSelectedItemPosition();
+        int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
+
+        int endPointPosition = mEndPoint.getSelectedItemPosition();
+        int endPointID = mEndDestinationPoints.get(endPointPosition).ID;
+
+        int[] routeIds;
+        if (startPointID == -1) {
+            routeIds = mDbHelper.reverseRoutes[endPointID].routeIds;
         } else if (endPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[startPointID - 1].routeIds;
+            routeIds = mDbHelper.reverseRoutes[startPointID].routeIds;
         } else {
-            routeIds = mergeRoutes(mDbHelper.reverseRoutes[endPointID - 1].routeIds,
-                    mDbHelper.reverseRoutes[startPointID - 1].routeIds);
+            routeIds = mergeRoutes(mDbHelper.reverseRoutes[endPointID].routeIds,
+                    mDbHelper.reverseRoutes[startPointID].routeIds);
         }
         int routesCount = routeIds.length;
         final Route[] filteredRoutes = new Route[routesCount];
         for (int i = 0; i < routesCount; i++) {
-            filteredRoutes[i] = mDbHelper.routes[routeIds[i] - 1];
+            filteredRoutes[i] = mDbHelper.routes[routeIds[i]];
         }
-        adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
-        mListView.setEmptyView(mEmptyView);
+        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra(DetailActivity.ROUTE_ID, filteredRoutes[position].ID-1);
+                intent.putExtra(DetailActivity.ROUTE_ID, filteredRoutes[position].ID);
                 startActivity(intent);
             }
         });
+    }
+
+    private ArrayList<DestinationPoint> getDestinationListFromArray(int[] destIds) {
+        ArrayList<DestinationPoint> destinationPointList = new ArrayList<>();
+        for (int destId : destIds) {
+            destinationPointList.add(mDbHelper.destinationPoints[destId]);
+        }
+        Collections.sort(destinationPointList);
+        destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
+        return destinationPointList;
     }
 
     private int[] mergeRoutes(int[] routeIds1, int[] routeIds2) {
@@ -132,11 +161,6 @@ public class QueryByDestinationsFragment extends Fragment implements AdapterView
         }
         return mergedRoutes;
     }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-    }
-
 
     private class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> {
         LayoutInflater mInflater;

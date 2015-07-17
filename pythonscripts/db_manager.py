@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sqlite3
 import os
@@ -12,13 +12,18 @@ def createDb(dbfilename):
 	c = conn.cursor()
 
 
-	c.execute('''CREATE TABLE destinations (_id integer primary key, name text)''')
+	c.execute('''CREATE TABLE destinations (id integer, name text)''')
 	print "'destinations' table is created"
-	c.execute('''CREATE TABLE routes (_id integer primary key, type integer, displaynumber integer, 
+
+	c.execute('''CREATE TABLE routes (id integer, type integer, displaynumber integer, 
 					pointA integer, pointB integer, pointC integer)''')
 	print "'routes' table is created"
-	c.execute('''CREATE TABLE reverseroutes (_id integer primary key, destinationId integer, routeIds text)''')
+
+	c.execute('''CREATE TABLE reverseroutes (destinationId integer, routeIds text)''')
 	print "'reverseroutes' table is created"
+
+	c.execute('''CREATE TABLE reachibledestinations (destinationId integer, reachibleDestinationIds text)''')
+	print "'reachibledestinations' table is created"
 
 	# for use in android
 	c.execute('''CREATE TABLE "android_metadata" ("locale" TEXT DEFAULT 'en_US')''')
@@ -35,13 +40,24 @@ def fillDb(dbfilename, csvfile):
 		conn = sqlite3.connect(dbfilename)
 		c = conn.cursor()
 
+		# dict with keys corresponding to destination names, 
+		# and values to destination IDs
 		destinations = {}
+
+		# dict with keys corresponding to destination IDs,
+		# and values to list of route IDs
 		reverseroutes = {}
 
-		counter = 0
+		# dict with keys corresponding to destination IDs,
+		# and values to set of reachible destination IDs
+		reachibledestinations = {}
+
+		counter = -1
+		routeIdCounter = 0
+
 		for line in f:
-			if counter == 0:
-				counter = 1
+			if counter == -1:
+				counter = 0
 				continue;
 
 			chunks = line.split(',')
@@ -66,36 +82,62 @@ def fillDb(dbfilename, csvfile):
 			# print point_ids
 			# print 'type=', transportType, ', displaynumber=',displaynumber
 
-			c.execute('''INSERT INTO routes (type, displaynumber, pointA, pointB, pointC)
-						 VALUES (?, ?, ?, ?, ?)''', \
-						  (transportType, displaynumber, point_ids[0], point_ids[1], point_ids[2]))
-
-			lastrowid = c.lastrowid
-
+			c.execute('''INSERT INTO routes (id, type, displaynumber, pointA, pointB, pointC)
+						 VALUES (?, ?, ?, ?, ?, ?)''', \
+						  (routeIdCounter, transportType, displaynumber, point_ids[0], point_ids[1], point_ids[2]))
+			lastrowid = routeIdCounter
+			# print 'lastrowid=',lastrowid
 
 			for i in xrange(3):
-				if points[i]:
-					if reverseroutes.has_key(point_ids[i]):
-						reverseroutes[point_ids[i]].append(lastrowid)
-					else:
-						reverseroutes[point_ids[i]] = [lastrowid]
+				if not points[i]:
+					continue
+
+				# add reverse routes
+				if reverseroutes.has_key(point_ids[i]):
+					reverseroutes[point_ids[i]].append(lastrowid)
+				else:
+					reverseroutes[point_ids[i]] = [lastrowid]
+
+				# add all three destinations to each of destinations as reachible
+				if reachibledestinations.has_key(point_ids[i]):
+					reachibledestinations[point_ids[i]].add(point_ids[0])
+					reachibledestinations[point_ids[i]].add(point_ids[1])
+				else:
+					reachibledestinations[point_ids[i]] = set([point_ids[0], point_ids[1]])
+
+				if points[2]:
+					reachibledestinations[point_ids[i]].add(point_ids[2])
+
+			routeIdCounter += 1
 
 		destination_arr = [''] * len(destinations)
 		for name in destinations.keys():
-			destination_arr[destinations[name]-1] = name
+			destination_arr[destinations[name]] = name
 
-		for name in destination_arr:
+		for idx, name in enumerate(destination_arr):
 			#print name, type(name)
-			c.execute('''INSERT INTO destinations (name) VALUES (?)''', (name,))
+			c.execute('''INSERT INTO destinations (id, name) VALUES (?, ?)''', (idx, name))
 
+		print "reverse routes"
 		printLines()
-
 		for destId in reverseroutes.keys():
 			routeIds = map(str, reverseroutes[destId])
 			c.execute('''INSERT INTO reverseroutes (destinationId, routeIds) VALUES (?, ?)''',\
 							(destId, ','.join(routeIds)))
 			print destId, ','.join(routeIds)
 
+		printLines()
+		print "reachible destinations"
+		printLines()
+		for destId in reachibledestinations.keys():
+			# remove self
+			reachibledestinations[destId] -= set([destId])
+
+			reachibledestinationIds = map(str, reachibledestinations[destId])
+			c.execute('''INSERT INTO reachibledestinations (destinationId, reachibleDestinationIds)
+						 VALUES (?, ?)''', (destId, ','.join(reachibledestinationIds)))
+			print destId, ','.join(reachibledestinationIds)
+			
 		conn.commit()
 		conn.close()
 
@@ -103,7 +145,7 @@ def printData(dbfilename):
 	conn = sqlite3.connect(dbfilename)
 	c = conn.cursor()
 
-	c.execute("SELECT _id, name FROM destinations")
+	c.execute("SELECT id, name FROM destinations")
 
 	rows = c.fetchall()
 	#points = [(x[0], x[1]) for x in rows]
@@ -112,22 +154,26 @@ def printData(dbfilename):
 	points = []	
 	
 	printLines()
+	print "All destinations"
+	printLines()
 
 	for row in rows:
 		points.append(row[1])
 		print row[0], row[1]
 
 	printLines()
+	print "All routes"
+	printLines()
 
-	c.execute("SELECT _id, type, displaynumber, pointA, pointB, pointC FROM routes")
+	c.execute("SELECT id, type, displaynumber, pointA, pointB, pointC FROM routes")
 
 	rows = c.fetchall()
 
 	for row in rows:
 		print row[0], ('AVTOBUS' if row[1] == 1 else 'MARSHRUTKA'), 'N%d'%row[2], \
-				points[row[3]-1], '-', points[row[4]-1], \
+				points[row[3]], '-', points[row[4]], \
 				'-' if row[5] != -1 else '', \
-				points[row[5]-1] if row[5] != -1 else ''
+				points[row[5]] if row[5] != -1 else ''
 
 	conn.commit()
 	conn.close()
@@ -189,9 +235,52 @@ def printReverseData(dbfilename):
 	conn.commit()
 	conn.close()
 
+def printReachibleDestinations(dbfilename):
+	conn = sqlite3.connect(dbfilename)
+	c = conn.cursor()
+
+	orayliqBazarId = getDestIdByName(c, u'Орайлық базар')
+	askeriyGarnizonId = getDestIdByName(c, u'Әскерий гарнизон')
+	xojanAwilId = getDestIdByName(c, u'Хожан аўыл')
+	adayAwilId = getDestIdByName(c, u'Адай аўыл')
+
+	points = getAllDestinationPoints(c)
+
+	printLines()
+	print u'Орайлық базарға жөнелиси бар мәнзиллер: '
+	destinations = getReachibleDestIds(c, orayliqBazarId)
+	printDestinationsById(points, destinations.split(','))
+
+	printLines()
+	print u'Әскерий гарнизонға жөнелиси бар мәнзиллер: '
+	destinations = getReachibleDestIds(c, askeriyGarnizonId)
+	printDestinationsById(points, destinations.split(','))	
+
+	printLines()
+	print u'Хожан аўылға жөнелиси бар мәнзиллер: '
+	destinations = getReachibleDestIds(c, xojanAwilId)
+	printDestinationsById(points, destinations.split(','))	
+
+	printLines()
+	print u'Адай аўылға жөнелиси бар мәнзиллер: '
+	destinations = getReachibleDestIds(c, adayAwilId)
+	printDestinationsById(points, destinations.split(','))	
+
+	conn.commit()
+	conn.close()
+
+def getReachibleDestIds(cursor, destId):
+	cursor.execute("SELECT reachibleDestinationIds from reachibledestinations where destinationId = ?", (destId, ))
+	return cursor.fetchone()[0]
+
+def printDestinationsById(points, destIdList):
+	destIdsAsStr = []
+	for destId in destIdList:
+		destIdsAsStr.append(points[int(destId)])
+	print ', '.join(destIdsAsStr)
 
 def getDestIdByName(cursor, name):
-	cursor.execute("SELECT _id FROM destinations WHERE name = ?", [name])
+	cursor.execute("SELECT id FROM destinations WHERE name = ?", [name])
 	return cursor.fetchone()[0]
 
 """points array is indexed from 0, but _id in destinations starts from 1"""
@@ -209,14 +298,14 @@ def getRouteIdsByDestinationId(cursor, destId):
 	return cursor.fetchone()[0]
 
 def printRoutesByRouteIds(cursor, routeIds, points):
-	cursor.execute("SELECT _id, type, displaynumber, pointA, pointB, pointC FROM routes WHERE _id IN ("+routeIds+")")
+	cursor.execute("SELECT id, type, displaynumber, pointA, pointB, pointC FROM routes WHERE id IN ("+routeIds+")")
 	rows = cursor.fetchall()
 
 	for row in rows:
 		print row[0], ('AVTOBUS' if row[1] == 1 else 'MARSHRUTKA'), 'N%d'%row[2], \
-				points[row[3]-1], '-', points[row[4]-1], \
+				points[row[3]], '-', points[row[4]], \
 				'-' if row[5] != -1 else '', \
-				points[row[5]-1] if row[5] != -1 else ''
+				points[row[5]] if row[5] != -1 else ''
 
 	return len(rows)
 
@@ -228,3 +317,4 @@ if __name__ == '__main__':
 	fillDb('marshrutka.db', 'marshrutka.csv')
 	printData('marshrutka.db')
 	printReverseData('marshrutka.db')
+	printReachibleDestinations('marshrutka.db')

@@ -27,6 +27,7 @@
     <style name="DestionationPointText">
         <item name="android:textSize">16sp</item>
         <item name="android:padding">3dp</item>
+        <item name="android:textColor">@color/text_color</item>
     </style>
 
     <style name="QueryByDestinationLabelText">

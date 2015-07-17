@@ -56,5 +56,11 @@
             android:textSize="18sp"
             android:textStyle="italic"
             android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/clear_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
     </FrameLayout>
 </LinearLayout>

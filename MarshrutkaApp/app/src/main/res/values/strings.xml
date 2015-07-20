@@ -1,12 +1,10 @@
 <resources>
-    <string name="app_name">Маршрутка</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name" translatable="false">Marshrutka</string>
     <string name="start_point">Басланғыш мәнзил:</string>
     <string name="end_point">Соңғы мәнзил:</string>
     <string name="choose_destination"> ---- Мәнзилди сайлаң ---- </string>
     <string name="tab_text_numero_sign">№</string>
     <string name="tab_text_from_to">А -> Б</string>
-    <string name="title_activity_detail">DetailActivity</string>
 
     <string name="type_of_transport">Транспорт түри:</string>
     <string name="transport_number">Жөнелис номери:</string>
@@ -14,5 +12,26 @@
 
     <string name="type_of_transport_bus">Автобус</string>
     <string name="type_of_transport_marshrutka">Маршрутка</string>
-    <string name="no_destinations_found_by_given_route">Берилген мәнзиллер бойынша маршрутка ямаса автобус жөнелиси табылмады.</string>
+
+    <string name="pref_interface_key" translatable="false">interface</string>
+    <string name="pref_interface_default" translatable="false">cyrillic</string>
+
+    <string name="pref_interface_label">Бағдарлама интерфейси</string>
+    <string name="action_settings">Сазлаўлар</string>
+    <string name="action_about">Ҳаққында</string>
+    <string name="action_other_apps">Басқа жумысларымыз</string>
+    <string name="title_activity_about">Бағдарлама ҳаққында</string>
+
+    <string name="about_title">Android мобиль операцион системасы ушын Нөкис қаласы маршруткалар ҳаққында мағлыўмат бериўши бағдарлама</string>
+    <string name="about_app_name" translatable="false">Marshrutka v.1.0\n\n by</string>
+    <string name="about_developer" translatable="false">Shag\'ala Lab</string>
+    <string name="about_content_source">Marshrutka ― ашық-дерекли (open-source) бағдарлама болып, қәлеўшилер яки үлес қосаман дейтуғынлар дерегин <a href="https://github.com/shagalalab/Marshrutka">https://github.com/shagalalab/Marshrutka</a> адресине өтиў арқалы көриўи мүмкин.</string>
+    <string name="about_contact">Бағдарлама жаратыўшылары менен info@shagalalab.com email адресине хат жазыӯ, ямаса www.shagalalab.com сайтындағы \'Байланыс\' бетинде жайласқан форманы толтырыў арқалы байланысыўыңызға болады.</string>
+
+    <string name="pref_interface_options_label_cyrillic">Кирилл әлипбеси</string>
+    <string name="pref_interface_options_label_latin">Латын әлипбеси</string>
+    <string name="pref_interface_options_key_cyrillic" translatable="false">cyrillic</string>
+    <string name="pref_interface_options_key_latin" translatable="false">latin</string>
+
+    <string name="preference_setting_cancel">Бийкар етиӯ</string>
 </resources>

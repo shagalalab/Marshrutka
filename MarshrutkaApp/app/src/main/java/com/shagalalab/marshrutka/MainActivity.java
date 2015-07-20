@@ -2,7 +2,12 @@ package com.shagalalab.marshrutka;
 
 import java.util.Locale;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -13,6 +18,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +29,9 @@ import com.shagalalab.marshrutka.widget.SlidingTabLayout;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    public final static String TAG = "marshrutka";
+    public final static String DEVELOPER_PLAY_LINK = "market://search?q=pub:Shag'ala Lab";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -39,11 +48,21 @@ public class MainActivity extends AppCompatActivity {
      */
     ViewPager mViewPager;
     private String[] TAB_NAMES;
+    String uiInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        uiInterface = prefs.getString(getString(R.string.pref_interface_key),
+                getString(R.string.pref_interface_default));
+
+        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
+            Utility.changeLocale(this);
+        }
+
         setContentView(R.layout.activity_main);
 
         TAB_NAMES = new String[] {
@@ -75,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -91,11 +110,21 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.action_about) {
+            startActivity(new Intent(this, AboutActivity.class));
+            return true;
+        } else if (id == R.id.action_other_apps) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(DEVELOPER_PLAY_LINK));
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -127,4 +156,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Log.w(TAG, "onConfigurationChanged");
+        super.onConfigurationChanged(newConfig);
+
+        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
+            Utility.changeLocale(this);
+        }
+    }
 }

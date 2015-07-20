@@ -1,0 +1,116 @@
+package com.shagalalab.marshrutka;
+
+import android.app.ActionBar;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+
+import com.shagalalab.marshrutka.widget.AppCompatPreferenceActivity;
+
+/**
+ * A {@link PreferenceActivity} that presents a set of application settings.
+ * <p>
+ * See <a href="http://developer.android.com/design/patterns/settings.html">
+ * Android Design: Settings</a> for design guidelines and the <a
+ * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
+ * API Guide</a> for more information on developing a Settings UI.
+ */
+public class SettingsActivity extends AppCompatPreferenceActivity
+        implements Preference.OnPreferenceChangeListener {
+
+    // since we use the preference change initially to populate the summary
+    // field, we'll ignore that change at start of the activity
+    boolean mBindingPreference;
+    private String uiInterface;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        uiInterface = prefs.getString(getString(R.string.pref_interface_key),
+                getString(R.string.pref_interface_default));
+
+        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
+            Utility.changeLocale(this);
+        }
+
+        // Add 'general' preferences, defined in the XML file
+        addPreferencesFromResource(R.xml.pref_general);
+
+        if (Build.VERSION.SDK_INT > 10) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(R.string.action_settings);
+            }
+        }
+
+        // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
+        // updated when the preference changes.
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_interface_key)));
+    }
+
+    /**
+     * Attaches a listener so the summary is always updated with the preference value.
+     * Also fires the listener once, to initialize the summary (so it shows up before the value
+     * is changed.)
+     */
+    private void bindPreferenceSummaryToValue(Preference preference) {
+        mBindingPreference = true;
+
+        // Set the listener to watch for value changes.
+        preference.setOnPreferenceChangeListener(this);
+
+        // Trigger the listener immediately with the preference's
+        // current value.
+        onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getString(preference.getKey(), ""));
+
+        mBindingPreference = false;
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object value) {
+        String newValue = value.toString();
+        String oldValue = preference.getSharedPreferences().getString(getString(R.string.pref_interface_key), "");
+
+        if (!mBindingPreference && !oldValue.equals(newValue)
+            && preference.getKey().equals(getString(R.string.pref_interface_key))) {
+                Utility.NEED_RESTART = true;
+                finish();
+
+        }
+
+        if (preference instanceof ListPreference) {
+            // For list preferences, look up the correct display value in
+            // the preference's 'entries' list (since they have separate labels/values).
+            ListPreference listPreference = (ListPreference) preference;
+            int prefIndex = listPreference.findIndexOfValue(newValue);
+            if (prefIndex >= 0) {
+                preference.setSummary(listPreference.getEntries()[prefIndex]);
+            }
+        } else {
+            // For other preferences, set the summary to the value's simple string representation.
+            preference.setSummary(newValue);
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
+            Utility.changeLocale(this);
+        }
+    }
+}

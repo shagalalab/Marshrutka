@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_interface_options">
+        <item>@string/pref_interface_options_label_cyrillic</item>
+        <item>@string/pref_interface_options_label_latin</item>
+    </array>
+
+    <array name="pref_interface_values">
+        <item>@string/pref_interface_options_key_cyrillic</item>
+        <item>@string/pref_interface_options_key_latin</item>
+    </array>
+</resources>

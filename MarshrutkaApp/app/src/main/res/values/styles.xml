@@ -10,8 +10,12 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
     <style name="AppTheme" parent="AppTheme.Base">
-
     </style>
+
+    <!-- Settings activity theme. -->
+    <style name="ActionBarEnabledTheme" parent="AppTheme">
+    </style>
+
     <style name="TabIndicator" parent="ActionBarThemeOverlay"/>
     <style name="ActionBarThemeOverlay" parent="">
         <item name="android:textColorPrimary">#fff</item>
@@ -35,7 +39,11 @@
         <item name="android:padding">3dp</item>
     </style>
 
-    <style name="ListFastScrollStyle">
+    <style name="AboutTextViews">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">@color/list_item_text_color</item>
     </style>
-
 </resources>

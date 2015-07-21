@@ -12,7 +12,7 @@ def createDb(dbfilename):
 	c = conn.cursor()
 
 
-	c.execute('''CREATE TABLE destinations (id integer, name text)''')
+	c.execute('''CREATE TABLE destinations (id integer, name_cyr text, name_lat text)''')
 	print "'destinations' table is created"
 
 	c.execute('''CREATE TABLE routes (id integer, type integer, displaynumber integer, 
@@ -116,7 +116,7 @@ def fillDb(dbfilename, csvfile):
 
 		for idx, name in enumerate(destination_arr):
 			#print name, type(name)
-			c.execute('''INSERT INTO destinations (id, name) VALUES (?, ?)''', (idx, name))
+			c.execute('''INSERT INTO destinations (id, name_cyr, name_lat) VALUES (?, ?, ?)''', (idx, name, cyrToLatConvertor(name)))
 
 		print "reverse routes"
 		printLines()
@@ -145,7 +145,7 @@ def printData(dbfilename):
 	conn = sqlite3.connect(dbfilename)
 	c = conn.cursor()
 
-	c.execute("SELECT id, name FROM destinations")
+	c.execute("SELECT id, name_cyr, name_lat FROM destinations")
 
 	rows = c.fetchall()
 	#points = [(x[0], x[1]) for x in rows]
@@ -159,7 +159,7 @@ def printData(dbfilename):
 
 	for row in rows:
 		points.append(row[1])
-		print row[0], row[1]
+		print row[0], '-', row[1], '-', row[2]
 
 	printLines()
 	print "All routes"
@@ -280,11 +280,11 @@ def printDestinationsById(points, destIdList):
 	print ', '.join(destIdsAsStr)
 
 def getDestIdByName(cursor, name):
-	cursor.execute("SELECT id FROM destinations WHERE name = ?", [name])
+	cursor.execute("SELECT id FROM destinations WHERE name_cyr = ?", [name])
 	return cursor.fetchone()[0]
 
 def getAllDestinationPoints(cursor):
-	cursor.execute("SELECT name FROM destinations")
+	cursor.execute("SELECT name_cyr FROM destinations")
 	rows = cursor.fetchall()
 	
 	points = []	
@@ -310,6 +310,105 @@ def printRoutesByRouteIds(cursor, routeIds, points):
 
 def printLines():
 	print "-" * 40
+
+
+def cyrToLatConvertor(text):
+    character_mapping_upper = {
+        u'А': u"A",
+        u'Ә': u"A'",
+        u'Б': u"B",
+        u'В': u"V",
+        u'Г': u"G",
+        u'Ғ': u"G'",
+        u'Д': u"D",
+        u'Е': u"E",
+        u'Ё': u"Yo",
+        u'Ж': u"J",
+        u'З': u"Z",
+        u'И': u"İ",
+        u'Й': u"Y",
+        u'К': u"K",
+        u'Қ': u"Q",
+        u'Л': u"L",
+        u'М': u"M",
+        u'Н': u"N",
+        u'Ң': u"N'",
+        u'О': u"O",
+        u'Ө': u"O'",
+        u'П': u"P",
+        u'Р': u"R",
+        u'С': u"S",
+        u'Т': u"T",
+        u'У': u"U",
+        u'Ү': u"U'",
+        u'Ў': u"W",
+        u'Ф': u"F",
+        u'Х': u"X",
+        u'Ҳ': u"H",
+        u'Ц': u"Ts",
+        u'Ч': u"Ch",
+        u'Ш': u"Sh",
+        u'Щ': u"Sh",
+        u'Ъ': u"",
+        u'Ы': u"I",
+        u'Ь': u"",
+        u'Э': u"E",
+        u'Ю': u"Yu",
+        u'Я': u"Ya",
+    }
+
+    character_mapping_lower = {
+        u'а': u"a",
+        u'ә': u"a'",
+        u'б': u"b",
+        u'в': u"v",
+        u'г': u"g",
+        u'ғ': u"g'",
+        u'д': u"d",
+        u'е': u"e",
+        u'ё': u"yo",
+        u'ж': u"j",
+        u'з': u"z",
+        u'и': u"i",
+        u'й': u"y",
+        u'к': u"k",
+        u'қ': u"q",
+        u'л': u"l",
+        u'м': u"m",
+        u'н': u"n",
+        u'ң': u"n'",
+        u'о': u"o",
+        u'ө': u"o'",
+        u'п': u"p",
+        u'р': u"r",
+        u'с': u"s",
+        u'т': u"t",
+        u'у': u"u",
+        u'ү': u"u'",
+        u'ў': u"w",
+        u'ф': u"f",
+        u'х': u"x",
+        u'ҳ': u"h",
+        u'ц': u"ts",
+        u'ч': u"ch",
+        u'ш': u"sh",
+        u'щ': u"sh",
+        u'ъ': u"",
+        u'ы': u"ı",
+        u'ь': u"",
+        u'э': u"e",
+        u'ю': u"yu",
+        u'я': u"ya",
+
+    }
+
+    for k, v in character_mapping_upper.iteritems():
+        text = text.replace(k, v)
+
+    for k, v in character_mapping_lower.iteritems():
+        text = text.replace(k, v)
+
+    return text
 
 if __name__ == '__main__':
 	createDb('marshrutka.db')

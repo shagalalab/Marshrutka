@@ -31,7 +31,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_DESTINATIONS = "destinations";
     private static final String COLUMN_DESTINATIONS_ID = "id";
-    private static final String COLUMN_DESTINATIONS_NAME = "name";
+    private static final String COLUMN_DESTINATIONS_NAME_CYR = "name_cyr";
+    private static final String COLUMN_DESTINATIONS_NAME_LAT = "name_lat";
 
     private static final String TABLE_REVERSEROUTES = "reverseroutes";
     private static final String COLUMN_REVERSEROUTES_DESTIONATIONID = "destinationId";
@@ -236,12 +237,14 @@ public class DbHelper extends SQLiteOpenHelper {
         Cursor cursor = mDataBase.query(TABLE_DESTINATIONS,
                         new String[] {
                                 COLUMN_DESTINATIONS_ID,
-                                COLUMN_DESTINATIONS_NAME
+                                COLUMN_DESTINATIONS_NAME_CYR,
+                                COLUMN_DESTINATIONS_NAME_LAT
                         }, null, null, null, null, null);
         while (cursor.moveToNext()) {
             int ID = cursor.getInt(0);
-            String name = cursor.getString(1);
-            DestinationPoint destinationPoint = new DestinationPoint(ID, name);
+            String name_cyr = cursor.getString(1);
+            String name_lat = cursor.getString(2);
+            DestinationPoint destinationPoint = new DestinationPoint(ID, name_cyr, name_lat);
             // Be careful, IDs in DB start from 1, while we will access destinationPoints
             // by array index that start from 0
             destinationPoints[ID] = destinationPoint;

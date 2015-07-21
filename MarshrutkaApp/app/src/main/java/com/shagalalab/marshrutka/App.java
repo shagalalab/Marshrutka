@@ -11,8 +11,8 @@ import java.util.Locale;
  * App-wide lifecycle events
  */
 public class App extends Application {
-    Locale CYRILLIC, LATIN;
-    boolean isLocaleCyrillic = true;
+    private Locale CYRILLIC, LATIN;
+    private boolean isLocaleCyrillic = true;
 
     @Override
     public void onCreate() {

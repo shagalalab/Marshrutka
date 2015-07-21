@@ -27,7 +27,8 @@ public class QueryByNumberFragment extends Fragment {
 
         DbHelper dbHelper = DbHelper.getInstance(getActivity());
 
-        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, dbHelper.routes);
+        boolean isInterfaceCyrillic = ((App)getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
+        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, dbHelper.routes, isInterfaceCyrillic);
         mListView.setAdapter(adapter);
         mListView.setFastScrollEnabled(true);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

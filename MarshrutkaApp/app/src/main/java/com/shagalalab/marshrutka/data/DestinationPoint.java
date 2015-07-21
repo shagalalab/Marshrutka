@@ -1,11 +1,12 @@
 package com.shagalalab.marshrutka.data;
 
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
  * Created by aziz on 7/10/15.
  */
-public class DestinationPoint implements Comparable<DestinationPoint> {
+public class DestinationPoint {
     private static final char[] QQ_ALPHABET = new char[] {
             'а', 'ә', 'б', 'в', 'г', 'ғ', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'қ', 'л', 'м',
             'н', 'ң', 'о', 'ө', 'п', 'р', 'с', 'т', 'у', 'ү', 'ў', 'ф', 'х', 'ҳ', 'ц', 'ч', 'ш',
@@ -20,45 +21,64 @@ public class DestinationPoint implements Comparable<DestinationPoint> {
     }
 
     public int ID;
-    public String name;
+    private String nameCyr;
+    private String nameLat;
 
     public DestinationPoint() {
     }
 
-    public DestinationPoint(int id, String name) {
+    public DestinationPoint(int id, String nameCyr, String nameLat) {
         this.ID = id;
-        this.name = name;
+        this.nameCyr = nameCyr;
+        this.nameLat = nameLat;
     }
 
-    @Override
-    public int compareTo(DestinationPoint that) {
-        char[] thisLowerCase = this.name.toLowerCase().toCharArray();
-        char[] thatLowerCase = that.name.toLowerCase().toCharArray();
+    public String getName(boolean isCyrillicInterface) {
+        if (isCyrillicInterface) {
+            return nameCyr;
+        } else {
+            return nameLat;
+        }
+    }
 
-        int len = Math.min(thisLowerCase.length, thatLowerCase.length);
-        for (int i=0; i<len; i++) {
-            char thisChar = thisLowerCase[i];
-            char thatChar = thatLowerCase[i];
-            Integer thisIndex = QQ_BINDINGS.get(thisChar);
-            Integer thatIndex = QQ_BINDINGS.get(thatChar);
-            if (thisIndex == null && thatIndex == null) {
-                if (thisChar == thatChar) {
+    public static final Comparator<DestinationPoint> QQ_CYR_COMPARATOR = new Comparator<DestinationPoint>() {
+        @Override
+        public int compare(DestinationPoint first, DestinationPoint second) {
+            char[] thisLowerCase = first.nameCyr.toLowerCase().toCharArray();
+            char[] thatLowerCase = second.nameCyr.toLowerCase().toCharArray();
+
+            int len = Math.min(thisLowerCase.length, thatLowerCase.length);
+            for (int i=0; i<len; i++) {
+                char thisChar = thisLowerCase[i];
+                char thatChar = thatLowerCase[i];
+                Integer thisIndex = QQ_BINDINGS.get(thisChar);
+                Integer thatIndex = QQ_BINDINGS.get(thatChar);
+                if (thisIndex == null && thatIndex == null) {
+                    if (thisChar == thatChar) {
+                        continue;
+                    } else {
+                        return thisChar - thatChar;
+                    }
+                } else if (thisIndex == null) {
+                    return thisChar - (int)'а';
+                } else if (thatIndex == null) {
+                    return (int)'а' - thatChar;
+                } else if (thatIndex.equals(thisIndex)) {
                     continue;
                 } else {
-                    return thisChar - thatChar;
+                    return thisIndex - thatIndex;
                 }
-            } else if (thisIndex == null) {
-                return thisChar - (int)'а';
-            } else if (thatIndex == null) {
-                return (int)'а' - thatChar;
-            } else if (thatIndex.equals(thisIndex)) {
-                continue;
-            } else {
-                return thisIndex - thatIndex;
             }
+            return first.nameCyr.compareTo(second.nameCyr);
         }
-        return this.name.compareTo(that.name);
-    }
+    };
+
+    public static final Comparator<DestinationPoint> QQ_LAT_COMPARATOR = new Comparator<DestinationPoint>() {
+        @Override
+        public int compare(DestinationPoint first, DestinationPoint second) {
+            return first.nameLat.compareTo(second.nameLat);
+        }
+    };
 
     @Override
     public boolean equals(Object that) {
@@ -67,6 +87,6 @@ public class DestinationPoint implements Comparable<DestinationPoint> {
         if (!(that instanceof DestinationPoint)) return false;
 
         DestinationPoint thatPoint = (DestinationPoint)that;
-        return this.ID == thatPoint.ID && this.name.equals(thatPoint.name);
+        return this.ID == thatPoint.ID && this.nameCyr.equals(thatPoint.nameCyr);
     }
 }

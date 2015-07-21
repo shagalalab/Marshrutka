@@ -21,6 +21,7 @@ import com.shagalalab.marshrutka.db.DbHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public class QueryByDestinationsFragment extends Fragment {
     ArrayList<DestinationPoint> mStartDestinationPoints, mEndDestinationPoints;
     DbHelper mDbHelper;
     Spinner mStartPoint, mEndPoint;
+    boolean mIsInterfaceCyrillic;
 
     @Nullable
     @Override
@@ -40,10 +42,13 @@ public class QueryByDestinationsFragment extends Fragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
 
         mDbHelper = DbHelper.getInstance(getActivity());
+        mIsInterfaceCyrillic = ((App)getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
 
         mStartDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
-        Collections.sort(mStartDestinationPoints);
-        mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
+        Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
+                                                                      : DestinationPoint.QQ_LAT_COMPARATOR;
+        Collections.sort(mStartDestinationPoints, comparator);
+        mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
 
         mStartPoint = (Spinner) view.findViewById(R.id.spinner_start_point);
         mEndPoint = (Spinner) view.findViewById(R.id.spinner_end_point);
@@ -115,7 +120,7 @@ public class QueryByDestinationsFragment extends Fragment {
         for (int i = 0; i < routesCount; i++) {
             filteredRoutes[i] = mDbHelper.routes[routeIds[i]];
         }
-        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes);
+        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes, mIsInterfaceCyrillic);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -132,8 +137,10 @@ public class QueryByDestinationsFragment extends Fragment {
         for (int destId : destIds) {
             destinationPointList.add(mDbHelper.destinationPoints[destId]);
         }
-        Collections.sort(destinationPointList);
-        destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination)));
+        Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
+                : DestinationPoint.QQ_LAT_COMPARATOR;
+        Collections.sort(destinationPointList, comparator);
+        destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
         return destinationPointList;
     }
 
@@ -175,7 +182,8 @@ public class QueryByDestinationsFragment extends Fragment {
                 convertView = mInflater.inflate(android.R.layout.simple_list_item_1, null);
             }
 
-            ((TextView) convertView).setText(getItem(position).name);
+            String text = getItem(position).getName(mIsInterfaceCyrillic);
+            ((TextView) convertView).setText(text);
             return convertView;
         }
 

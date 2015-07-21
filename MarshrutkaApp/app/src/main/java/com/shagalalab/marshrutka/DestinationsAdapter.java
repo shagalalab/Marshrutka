@@ -22,10 +22,12 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
     private String[] sections;
     private LinkedHashMap<String, Integer> sectionIndexer;
     private String mBusShortenedLabel;
+    private boolean mIsInterfaceCyrillic;
 
-    public DestinationsAdapter(Context context, int resource, Route[] objects) {
+    public DestinationsAdapter(Context context, int resource, Route[] objects, boolean isInterfaceCyrillic) {
         super(context, resource, objects);
         mInflater = LayoutInflater.from(context);
+        mIsInterfaceCyrillic = isInterfaceCyrillic;
 
         int len = objects.length;
         sectionIndexer = new LinkedHashMap<String, Integer>();
@@ -62,13 +64,13 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
         }
         Route route = getItem(position);
         holder.txtTransportNo.setText((route.isBus ? mBusShortenedLabel + "-" : "") + route.displayNo);
-        holder.pointA.setText(route.pointA.name);
-        holder.pointB.setText(route.pointB.name);
+        holder.pointA.setText(route.pointA.getName(mIsInterfaceCyrillic));
+        holder.pointB.setText(route.pointB.getName(mIsInterfaceCyrillic));
         if (route.pointC == null) {
             holder.pointC.setVisibility(View.GONE);
         } else {
             holder.pointC.setVisibility(View.VISIBLE);
-            holder.pointC.setText(route.pointC.name);
+            holder.pointC.setText(route.pointC.getName(mIsInterfaceCyrillic));
         }
         return convertView;
     }

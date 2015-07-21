@@ -37,6 +37,8 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
+        boolean isInterfaceCyrillic = ((App)getApplicationContext()).isCurrentLocaleCyrillic();
+
         TextView txtTransportType = (TextView)findViewById(R.id.txt_typeoftransport);
         TextView txtTransportNo = (TextView)findViewById(R.id.txt_transportnumber);
 
@@ -48,10 +50,10 @@ public class DetailActivity extends AppCompatActivity {
         mInflater = LayoutInflater.from(this);
 
         final LinearLayout txtContainer = (LinearLayout)findViewById(R.id.destination_txt_container);
-        txtContainer.addView(generateTextView(currentRoute.pointA.name));
-        txtContainer.addView(generateTextView(currentRoute.pointB.name));
+        txtContainer.addView(generateTextView(currentRoute.pointA.getName(isInterfaceCyrillic)));
+        txtContainer.addView(generateTextView(currentRoute.pointB.getName(isInterfaceCyrillic)));
         if (currentRoute.pointC != null) {
-            txtContainer.addView(generateTextView(currentRoute.pointC.name));
+            txtContainer.addView(generateTextView(currentRoute.pointC.getName(isInterfaceCyrillic)));
         }
         final PathDrawer pathDrawer = (PathDrawer)findViewById(R.id.path_drawer);
         txtContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {

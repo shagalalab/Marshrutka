@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (Utils.NEED_RESTART) {
             Utils.NEED_RESTART = false;
+
             recreateActivity();
         }
     }

@@ -23,6 +23,7 @@
                 android:text="@string/about_title" />
 
             <TextView
+                android:id="@+id/txt_app_name_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

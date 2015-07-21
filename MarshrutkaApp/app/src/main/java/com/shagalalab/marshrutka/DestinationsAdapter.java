@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.shagalalab.marshrutka.data.Route;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -22,6 +21,7 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
     private LayoutInflater mInflater;
     private String[] sections;
     private LinkedHashMap<String, Integer> sectionIndexer;
+    private String mBusShortenedLabel;
 
     public DestinationsAdapter(Context context, int resource, Route[] objects) {
         super(context, resource, objects);
@@ -29,11 +29,12 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
 
         int len = objects.length;
         sectionIndexer = new LinkedHashMap<String, Integer>();
+        mBusShortenedLabel = context.getString(R.string.bus_shortened_label);
         for (int i=0; i<len; i++) {
             Route current = objects[i];
             if (current.isBus) {
                 if (current.displayNo == 1) {
-                    sectionIndexer.put("АВ", i);
+                    sectionIndexer.put(mBusShortenedLabel, i);
                 }
             } else {
                 if (current.displayNo == 1 || current.displayNo % 10 == 0) {
@@ -60,7 +61,7 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
             holder = (ViewHolder) convertView.getTag();
         }
         Route route = getItem(position);
-        holder.txtTransportNo.setText((route.isBus ? "АВ-" : "") + route.displayNo);
+        holder.txtTransportNo.setText((route.isBus ? mBusShortenedLabel + "-" : "") + route.displayNo);
         holder.pointA.setText(route.pointA.name);
         holder.pointB.setText(route.pointB.name);
         if (route.pointC == null) {

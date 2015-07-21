@@ -1,7 +1,8 @@
 package com.shagalalab.marshrutka;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
@@ -28,5 +29,19 @@ public class AboutActivity extends AppCompatActivity {
 
         TextView tvDescription = (TextView) findViewById(R.id.description);
         tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
+
+        TextView txtAppVersionName = (TextView)findViewById(R.id.txt_app_name_version);
+        String appVersionName = String.format(getString(R.string.about_app_name), getVersionName());
+        txtAppVersionName.setText(appVersionName);
+    }
+
+    private String getVersionName() {
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

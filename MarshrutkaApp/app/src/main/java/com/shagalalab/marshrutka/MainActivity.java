@@ -1,29 +1,19 @@
 package com.shagalalab.marshrutka;
 
-import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.shagalalab.marshrutka.widget.SlidingTabLayout;
 
@@ -48,20 +38,13 @@ public class MainActivity extends AppCompatActivity {
      */
     ViewPager mViewPager;
     private String[] TAB_NAMES;
-    String uiInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        uiInterface = prefs.getString(getString(R.string.pref_interface_key),
-                getString(R.string.pref_interface_default));
-
-        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
-            Utility.changeLocale(this);
-        }
+        ((App)getApplicationContext()).changeLocaleIfNeeded();
 
         setContentView(R.layout.activity_main);
 
@@ -93,6 +76,25 @@ public class MainActivity extends AppCompatActivity {
         slidingTabLayout.setViewPager(mViewPager);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Utils.NEED_RESTART) {
+            Utils.NEED_RESTART = false;
+            recreateActivity();
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private void recreateActivity() {
+        // recreate() API is available only from API11
+        // for older versions we need to perform alternative instructions
+        if (Build.VERSION.SDK_INT == 10) {
+            Utils.pendingRestartApp(this, getIntent());
+        } else {
+            recreate();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -153,16 +155,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return TAB_NAMES[position];
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        Log.w(TAG, "onConfigurationChanged");
-        super.onConfigurationChanged(newConfig);
-
-        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
-            Utility.changeLocale(this);
         }
     }
 }

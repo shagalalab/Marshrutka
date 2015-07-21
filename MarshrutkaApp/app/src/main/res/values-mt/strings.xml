@@ -14,6 +14,8 @@
     <string name="type_of_transport_bus">Avtobus</string>
     <string name="type_of_transport_marshrutka">Marshrutka</string>
 
+    <string name="bus_shortened_label">AV</string>
+
     <string name="pref_interface_label">Bag\'darlama interfeysi</string>
 
     <string name="action_about">Haqqında</string>

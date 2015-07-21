@@ -1,10 +1,5 @@
 package com.shagalalab.marshrutka;
 
-import android.app.ActionBar;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -33,23 +28,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        uiInterface = prefs.getString(getString(R.string.pref_interface_key),
-                getString(R.string.pref_interface_default));
-
-        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
-            Utility.changeLocale(this);
-        }
-
         // Add 'general' preferences, defined in the XML file
         addPreferencesFromResource(R.xml.pref_general);
 
-        if (Build.VERSION.SDK_INT > 10) {
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(R.string.action_settings);
-            }
-        }
+        getSupportActionBar().setTitle(R.string.action_settings);
 
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
@@ -84,9 +66,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
 
         if (!mBindingPreference && !oldValue.equals(newValue)
             && preference.getKey().equals(getString(R.string.pref_interface_key))) {
-                Utility.NEED_RESTART = true;
+                Utils.NEED_RESTART = true;
                 finish();
-
         }
 
         if (preference instanceof ListPreference) {
@@ -103,14 +84,5 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         }
 
         return true;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (!uiInterface.equals(getString(R.string.pref_interface_default))) {
-            Utility.changeLocale(this);
-        }
     }
 }

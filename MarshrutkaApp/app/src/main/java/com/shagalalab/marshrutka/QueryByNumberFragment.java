@@ -1,6 +1,5 @@
 package com.shagalalab.marshrutka;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,13 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.shagalalab.marshrutka.data.DestinationPoint;
-import com.shagalalab.marshrutka.data.Route;
 import com.shagalalab.marshrutka.db.DbHelper;
 
 /**

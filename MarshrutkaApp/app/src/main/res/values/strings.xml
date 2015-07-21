@@ -13,6 +13,8 @@
     <string name="type_of_transport_bus">Автобус</string>
     <string name="type_of_transport_marshrutka">Маршрутка</string>
 
+    <string name="bus_shortened_label">АВ</string>
+
     <string name="pref_interface_key" translatable="false">interface</string>
     <string name="pref_interface_default" translatable="false">cyrillic</string>
 
@@ -23,7 +25,7 @@
     <string name="title_activity_about">Бағдарлама ҳаққында</string>
 
     <string name="about_title">Android мобиль операцион системасы ушын Нөкис қаласы маршруткалар ҳаққында мағлыўмат бериўши бағдарлама</string>
-    <string name="about_app_name" translatable="false">Marshrutka v.1.0\n\n by</string>
+    <string name="about_app_name" translatable="false">Marshrutka v.%s\n\n by</string>
     <string name="about_developer" translatable="false">Shag\'ala Lab</string>
     <string name="about_content_source">Marshrutka ― ашық-дерекли (open-source) бағдарлама болып, қәлеўшилер яки үлес қосаман дейтуғынлар дерегин <a href="https://github.com/shagalalab/Marshrutka">https://github.com/shagalalab/Marshrutka</a> адресине өтиў арқалы көриўи мүмкин.</string>
     <string name="about_contact">Бағдарлама жаратыўшылары менен info@shagalalab.com email адресине хат жазыӯ, ямаса www.shagalalab.com сайтындағы \'Байланыс\' бетинде жайласқан форманы толтырыў арқалы байланысыўыңызға болады.</string>

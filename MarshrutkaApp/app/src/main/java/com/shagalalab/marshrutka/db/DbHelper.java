@@ -217,8 +217,6 @@ public class DbHelper extends SQLiteOpenHelper {
             route.ID = cursor.getInt(0);
             route.isBus = cursor.getInt(1) == 1;
             route.displayNo = cursor.getInt(2);
-            // Be careful, IDs in DB start from 1, while we will access destinationPoints
-            // by array index that start from 0
             route.pointA = destinationPoints[cursor.getInt(3)];
             route.pointB = destinationPoints[cursor.getInt(4)];
             int pointC = cursor.getInt(5);
@@ -245,8 +243,6 @@ public class DbHelper extends SQLiteOpenHelper {
             String name_cyr = cursor.getString(1);
             String name_lat = cursor.getString(2);
             DestinationPoint destinationPoint = new DestinationPoint(ID, name_cyr, name_lat);
-            // Be careful, IDs in DB start from 1, while we will access destinationPoints
-            // by array index that start from 0
             destinationPoints[ID] = destinationPoint;
         }
         cursor.close();

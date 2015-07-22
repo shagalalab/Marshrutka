@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class QueryByDestinationsFragment extends Fragment {
 
+    private static final String TAG = "marshrutka";
+
     private ListView mListView;
     ArrayList<DestinationPoint> mStartDestinationPoints, mEndDestinationPoints;
     DbHelper mDbHelper;
@@ -195,6 +197,12 @@ public class QueryByDestinationsFragment extends Fragment {
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             return getCustomView(position, convertView, parent);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            DestinationPoint point = getItem(position);
+            return point.ID;
         }
     }
 }

@@ -19,6 +19,8 @@ import com.shagalalab.marshrutka.widget.AppCompatPreferenceActivity;
 public class SettingsActivity extends AppCompatPreferenceActivity
         implements Preference.OnPreferenceChangeListener {
 
+    private static final String TAG = "marshrutka";
+
     // since we use the preference change initially to populate the summary
     // field, we'll ignore that change at start of the activity
     boolean mBindingPreference;
@@ -66,6 +68,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
 
         if (!mBindingPreference && !oldValue.equals(newValue)
             && preference.getKey().equals(getString(R.string.pref_interface_key))) {
+
                 Utils.NEED_RESTART = true;
                 finish();
         }

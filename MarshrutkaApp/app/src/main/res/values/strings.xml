@@ -36,4 +36,6 @@
     <string name="pref_interface_options_key_latin" translatable="false">latin</string>
 
     <string name="preference_setting_cancel">Бийкар етиӯ</string>
+
+    <string name="pref_dbversion_key" translatable="false">db_version</string>
 </resources>

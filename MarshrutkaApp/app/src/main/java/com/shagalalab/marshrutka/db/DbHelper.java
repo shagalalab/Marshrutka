@@ -4,15 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.shagalalab.marshrutka.Utils;
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.ReachableDestinations;
 import com.shagalalab.marshrutka.data.ReverseRoute;
 import com.shagalalab.marshrutka.data.Route;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +52,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private final String DB_PATH;
 
     private static final String DB_NAME = "marshrutka.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     private SQLiteDatabase mDataBase;
 
@@ -88,6 +89,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         if (dbExist) {
             //do nothing - database already exist
+            Log.d(TAG, "DbHelper.createDatabaseIfNotExists() db exists & version is correct -> no need to copy from assets");
         } else {
 
             //By calling this method and empty database will be created into the default system path
@@ -102,20 +104,31 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    private void removeObsoleteDatabase() {
-        File dbfile = new File(DB_PATH + DB_NAME);
-        if (dbfile.exists()) {
-            dbfile.delete();
-        }
-    }
-
     /**
      * Check if the database already exist to avoid re-copying the file each time you open the application.
      *
      * @return true if it exists, false if it doesn't
      */
     private boolean checkDataBase() {
-        return new File(DB_PATH + DB_NAME).exists();
+        SQLiteDatabase checkDB = null;
+
+        try {
+            String myPath = DB_PATH + DB_NAME;
+            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+        } catch (SQLiteException e) {
+            //database doesn't exist yet.
+        }
+
+        if (checkDB != null) {
+            checkDB.close();
+            int currentDbVersion = Utils.getDbVersion(mContext);
+            if (currentDbVersion != DB_VERSION) {
+                Log.d(TAG, "DbHelper.checkDatabase() currentDb.version=" + currentDbVersion + ", newVersion=" + DB_VERSION);
+                return false;
+            }
+        }
+
+        return checkDB != null ? true : false;
     }
 
     /**
@@ -145,6 +158,10 @@ public class DbHelper extends SQLiteOpenHelper {
         myOutput.flush();
         myOutput.close();
         myInput.close();
+
+        Utils.setDbVersion(mContext, DB_VERSION);
+
+        Log.d(TAG, "DbHelper.copyDatabase()");
     }
 
     public void openDataBase() throws SQLException {
@@ -169,12 +186,6 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "DbHelper.onUpgrade() oldVersion="+oldVersion+", newVersion="+newVersion);
-        removeObsoleteDatabase();
-        try {
-            createDataBaseIfNotExists();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     // Add your public helper methods to access and get content from the database.

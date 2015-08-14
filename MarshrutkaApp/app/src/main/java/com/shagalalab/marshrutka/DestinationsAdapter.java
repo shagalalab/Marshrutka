@@ -55,28 +55,34 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
             convertView = mInflater.inflate(R.layout.query_list_item, null);
             holder = new ViewHolder();
             holder.txtTransportNo = (TextView) convertView.findViewById(R.id.txt_transport_no);
-            holder.pointA = (TextView) convertView.findViewById(R.id.txt_pointA);
-            holder.pointB = (TextView) convertView.findViewById(R.id.txt_pointB);
-            holder.pointC = (TextView) convertView.findViewById(R.id.txt_pointC);
+            holder.points = new TextView[5];
+            holder.points[0] = (TextView) convertView.findViewById(R.id.txt_point1);
+            holder.points[1] = (TextView) convertView.findViewById(R.id.txt_point2);
+            holder.points[2] = (TextView) convertView.findViewById(R.id.txt_point3);
+            holder.points[3] = (TextView) convertView.findViewById(R.id.txt_point4);
+            holder.points[4] = (TextView) convertView.findViewById(R.id.txt_point5);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         Route route = getItem(position);
         holder.txtTransportNo.setText((route.isBus ? mBusShortenedLabel + "-" : "") + route.displayNo);
-        holder.pointA.setText(route.pointA.getName(mIsInterfaceCyrillic));
-        holder.pointB.setText(route.pointB.getName(mIsInterfaceCyrillic));
-        if (route.pointC == null) {
-            holder.pointC.setVisibility(View.GONE);
-        } else {
-            holder.pointC.setVisibility(View.VISIBLE);
-            holder.pointC.setText(route.pointC.getName(mIsInterfaceCyrillic));
+        String description = route.getDescription(mIsInterfaceCyrillic);
+        String[] descriptionChunks = description.split(" - ");
+        int chunksLength = descriptionChunks.length;
+        for (int i=0; i<chunksLength; i++) {
+            holder.points[i].setVisibility(View.VISIBLE);
+            holder.points[i].setText(descriptionChunks[i]);
+        }
+        for (int i=chunksLength; i<5; i++) {
+            holder.points[i].setVisibility(View.GONE);
         }
         return convertView;
     }
 
     private class ViewHolder {
-        TextView txtTransportNo, pointA, pointB, pointC;
+        TextView txtTransportNo;
+        TextView[] points;
     }
 
     @Override

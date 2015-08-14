@@ -26,22 +26,33 @@
         android:paddingLeft="3dp">
 
         <TextView
-            android:id="@+id/txt_pointA"
+            android:id="@+id/txt_point1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/DestionationPointText"/>
 
         <TextView
-            android:id="@+id/txt_pointB"
+            android:id="@+id/txt_point2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/DestionationPointText"/>
 
         <TextView
-            android:id="@+id/txt_pointC"
+            android:id="@+id/txt_point3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/DestionationPointText"/>
 
+        <TextView
+            android:id="@+id/txt_point4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/DestionationPointText"/>
+
+        <TextView
+            android:id="@+id/txt_point5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/DestionationPointText"/>
     </LinearLayout>
 </LinearLayout>

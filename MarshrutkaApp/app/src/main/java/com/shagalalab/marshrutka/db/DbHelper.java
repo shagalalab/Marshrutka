@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class DbHelper extends SQLiteOpenHelper {
     private static final String TAG = "marshrutka";
@@ -26,9 +28,9 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ROUTES_ID = "id";
     private static final String COLUMN_ROUTES_TYPE = "type";
     private static final String COLUMN_ROUTES_DISPLAYNO = "displaynumber";
-    private static final String COLUMN_ROUTES_POINTA = "pointA";
-    private static final String COLUMN_ROUTES_POINTB = "pointB";
-    private static final String COLUMN_ROUTES_POINTC = "pointC";
+    private static final String COLUMN_ROUTES_DESCRIPTION_CYR = "description_cyr";
+    private static final String COLUMN_ROUTES_DESCRIPTION_LAT = "description_lat";
+    private static final String COLUMN_ROUTES_PATHPOINTIDS = "pathPointIds";
 
     private static final String TABLE_DESTINATIONS = "destinations";
     private static final String COLUMN_DESTINATIONS_ID = "id";
@@ -218,9 +220,9 @@ public class DbHelper extends SQLiteOpenHelper {
                             COLUMN_ROUTES_ID,
                             COLUMN_ROUTES_TYPE,
                             COLUMN_ROUTES_DISPLAYNO,
-                            COLUMN_ROUTES_POINTA,
-                            COLUMN_ROUTES_POINTB,
-                            COLUMN_ROUTES_POINTC
+                            COLUMN_ROUTES_DESCRIPTION_CYR,
+                            COLUMN_ROUTES_DESCRIPTION_LAT,
+                            COLUMN_ROUTES_PATHPOINTIDS
                         }, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
@@ -228,13 +230,31 @@ public class DbHelper extends SQLiteOpenHelper {
             route.ID = cursor.getInt(0);
             route.isBus = cursor.getInt(1) == 1;
             route.displayNo = cursor.getInt(2);
-            route.pointA = destinationPoints[cursor.getInt(3)];
-            route.pointB = destinationPoints[cursor.getInt(4)];
-            int pointC = cursor.getInt(5);
-            if (pointC != -1) {
-                route.pointC = destinationPoints[cursor.getInt(5)];
+            route.descriptionCyr = cursor.getString(3);
+            route.descriptionLat = cursor.getString(4);
+            String[] pathPointIds = cursor.getString(5).trim().split(",");
+            int len = pathPointIds.length;
+            ArrayList<DestinationPoint> destPoints = new ArrayList<>();
+            Stack<Integer> destPointStack = new Stack<>();
+            for (int i=0; i<len; i++) {
+                Integer destinationPointId = Integer.parseInt(pathPointIds[i]);
+                destPoints.add(destinationPoints[destinationPointId]);
+                if (i == len - 1) {
+                    if (destPointStack.contains(destinationPointId)) {
+                        while (!destPointStack.pop().equals(destinationPointId));
+                    } else {
+                        destPointStack.clear();
+                    }
+                } else {
+                    destPointStack.push(destinationPointId);
+                }
+            }
+            while (!destPointStack.isEmpty()) {
+                int current = destPointStack.pop();
+                destPoints.add(destinationPoints[current]);
             }
 
+            route.pathPoints = destPoints;
             routes[route.ID] = route;
         }
         cursor.close();

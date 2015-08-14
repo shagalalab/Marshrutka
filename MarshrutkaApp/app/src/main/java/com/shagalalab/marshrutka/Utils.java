@@ -41,5 +41,6 @@ public class Utils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(context.getString(R.string.pref_dbversion_key), newDbVersion);
+        editor.commit();
     }
 }

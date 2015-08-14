@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.shagalalab.marshrutka.db.DbHelper;
 import com.shagalalab.marshrutka.widget.SlidingTabLayout;
 
 
@@ -87,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("NewApi")
     private void recreateActivity() {
+        // invalidate data from DB to fetch right locale strings
+        DbHelper.reset();
+
+
+
         // recreate() API is available only from API11
         // for older versions we need to perform alternative instructions
         if (Build.VERSION.SDK_INT == 10) {

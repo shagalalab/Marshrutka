@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.shagalalab.marshrutka.App;
 import com.shagalalab.marshrutka.Utils;
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.ReachableDestinations;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class DbHelper extends SQLiteOpenHelper {
@@ -50,6 +52,8 @@ public class DbHelper extends SQLiteOpenHelper {
     public Route[] routes;
     public ReachableDestinations[] reachableDestinations;
 
+    public HashMap<String, Integer> destinationToIdMapping = new HashMap<>();
+
     //The Android's default system path of your application database.
     private final String DB_PATH;
 
@@ -80,6 +84,10 @@ public class DbHelper extends SQLiteOpenHelper {
             _instance.loadAllData();
         }
         return _instance;
+    }
+
+    public static void reset() {
+        _instance = null;
     }
 
     /**
@@ -261,6 +269,9 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private void loadDestinationPoints() {
+
+        boolean isInterfaceCyrillic = ((App)mContext.getApplicationContext()).isCurrentLocaleCyrillic();
+
         int count = getCount(TABLE_DESTINATIONS);
         destinationPoints = new DestinationPoint[count];
         Cursor cursor = mDataBase.query(TABLE_DESTINATIONS,
@@ -273,8 +284,11 @@ public class DbHelper extends SQLiteOpenHelper {
             int ID = cursor.getInt(0);
             String name_cyr = cursor.getString(1);
             String name_lat = cursor.getString(2);
-            DestinationPoint destinationPoint = new DestinationPoint(ID, name_cyr, name_lat);
+            DestinationPoint destinationPoint = new DestinationPoint(isInterfaceCyrillic, ID,
+                    isInterfaceCyrillic ? name_cyr : name_lat);
             destinationPoints[ID] = destinationPoint;
+            destinationToIdMapping.put(name_cyr, ID);
+            destinationToIdMapping.put(name_lat, ID);
         }
         cursor.close();
     }

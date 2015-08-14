@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.shagalalab.marshrutka.data.DestinationPoint;
@@ -34,7 +36,7 @@ public class QueryByDestinationsFragment extends Fragment {
     private ListView mListView;
     ArrayList<DestinationPoint> mStartDestinationPoints, mEndDestinationPoints;
     DbHelper mDbHelper;
-    Spinner mStartPoint, mEndPoint;
+    AutoCompleteTextView mStartPoint, mEndPoint;
     boolean mIsInterfaceCyrillic;
 
     @Nullable
@@ -48,20 +50,31 @@ public class QueryByDestinationsFragment extends Fragment {
 
         mStartDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
-                                                                      : DestinationPoint.QQ_LAT_COMPARATOR;
+                                                                       : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(mStartDestinationPoints, comparator);
-        mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
+        //mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
 
-        mStartPoint = (Spinner) view.findViewById(R.id.spinner_start_point);
-        mEndPoint = (Spinner) view.findViewById(R.id.spinner_end_point);
+        mStartPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_start_point);
+        mEndPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_end_point);
 
         DestinationPointsAdapter startPointAdapter = new DestinationPointsAdapter(getActivity(),
                 0, mStartDestinationPoints);
 
+
+/*
+        String[] months = new String[] {
+                "January", "February", "March", "April", "May", "June"
+        };
+        ArrayAdapter<String> monthsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, months);
+        ArrayAdapter<DestinationPoint> destPoints = new ArrayAdapter<DestinationPoint>(getActivity(), android.R.layout.simple_list_item_1, mStartDestinationPoints);
+*/
+
         mStartPoint.setAdapter(startPointAdapter);
+        mStartPoint.setThreshold(1);
 
         mStartPoint.setOnItemSelectedListener(new StartPointItemSelectedListener());
         mEndPoint.setOnItemSelectedListener(new EndPointItemSelectedListener());
+        mEndPoint.setThreshold(1);
 
         return view;
     }
@@ -70,13 +83,14 @@ public class QueryByDestinationsFragment extends Fragment {
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-            int startPointPosition = mStartPoint.getSelectedItemPosition();
-            int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
-            if (startPointID == -1) {
+            String selection = mStartPoint.getText().toString();
+            Integer destinationID = mDbHelper.destinationToIdMapping.get(selection);
+            //int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
+            if (destinationID == null) {
                 mEndPoint.setAdapter(null);
                 mListView.setAdapter(null);
             } else {
-                mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[startPointID].reachableDestinationIds);
+                mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[destinationID].reachableDestinationIds);
                 DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
                         0, mEndDestinationPoints);
                 mEndPoint.setAdapter(endPointAdapter);
@@ -102,20 +116,23 @@ public class QueryByDestinationsFragment extends Fragment {
     }
 
     private void setListAdapter() {
-        int startPointPosition = mStartPoint.getSelectedItemPosition();
-        int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
-
-        int endPointPosition = mEndPoint.getSelectedItemPosition();
-        int endPointID = mEndDestinationPoints.get(endPointPosition).ID;
+        Integer startPointID = mDbHelper.destinationToIdMapping.get(mStartPoint.getText().toString());
+        Integer endPointID = mDbHelper.destinationToIdMapping.get(mEndPoint.getText().toString());
 
         int[] routeIds;
-        if (startPointID == -1) {
+        /*if (startPointID == -1) {
             routeIds = mDbHelper.reverseRoutes[endPointID].routeIds;
         } else if (endPointID == -1) {
             routeIds = mDbHelper.reverseRoutes[startPointID].routeIds;
         } else {
             routeIds = mergeRoutes(mDbHelper.reverseRoutes[endPointID].routeIds,
                     mDbHelper.reverseRoutes[startPointID].routeIds);
+        }*/
+        if (startPointID == null || endPointID == null) {
+            routeIds = new int[0];
+        } else {
+            routeIds = mergeRoutes(mDbHelper.reverseRoutes[startPointID].routeIds,
+                                   mDbHelper.reverseRoutes[endPointID].routeIds);
         }
         int routesCount = routeIds.length;
         final Route[] filteredRoutes = new Route[routesCount];
@@ -142,7 +159,7 @@ public class QueryByDestinationsFragment extends Fragment {
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
                 : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(destinationPointList, comparator);
-        destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
+        //destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
         return destinationPointList;
     }
 
@@ -171,12 +188,17 @@ public class QueryByDestinationsFragment extends Fragment {
         return mergedRoutes;
     }
 
-    private class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> {
+    private class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> implements Filterable {
         LayoutInflater mInflater;
+        ArrayFilter mFilter;
+        List<DestinationPoint> mValues;
+        List<DestinationPoint> mOriginalValues;
 
         public DestinationPointsAdapter(Context context, int resource, List<DestinationPoint> objects) {
             super(context, resource, objects);
             mInflater = LayoutInflater.from(context);
+            mValues = objects;
+            mOriginalValues = new ArrayList<DestinationPoint>(objects);
         }
 
         private View getCustomView(int position, View convertView, ViewGroup parent) {
@@ -184,9 +206,19 @@ public class QueryByDestinationsFragment extends Fragment {
                 convertView = mInflater.inflate(android.R.layout.simple_list_item_1, null);
             }
 
-            String text = getItem(position).getName(mIsInterfaceCyrillic);
+            String text = getItem(position).name;
             ((TextView) convertView).setText(text);
             return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return mValues.size();
+        }
+
+        @Override
+        public DestinationPoint getItem(int position) {
+            return mValues.get(position);
         }
 
         @Override
@@ -203,6 +235,95 @@ public class QueryByDestinationsFragment extends Fragment {
         public long getItemId(int position) {
             DestinationPoint point = getItem(position);
             return point.ID;
+        }
+
+        @Override
+        public Filter getFilter() {
+            if (mFilter == null) {
+                mFilter = new ArrayFilter();
+            }
+            return mFilter;
+        }
+
+        private class ArrayFilter extends Filter {
+            private Object lock = new Object();
+
+            @Override
+            protected FilterResults performFiltering(CharSequence prefix) {
+                FilterResults results = new FilterResults();
+
+                if (mOriginalValues == null) {
+                    synchronized (lock) {
+                        mOriginalValues = new ArrayList<DestinationPoint>(mValues);
+                    }
+                }
+
+                if (prefix == null || prefix.length() == 0) {
+                    synchronized (lock) {
+                        ArrayList<DestinationPoint> list = new ArrayList<DestinationPoint>(mOriginalValues);
+                        /*for (DestinationPoint point : mOriginalValues) {
+                            list.add(point.getName(mIsInterfaceCyrillic));
+                        }*/
+                        results.values = list;
+                        results.count = list.size();
+                    }
+                } else {
+                    final String prefixString = prefix.toString().toLowerCase();
+
+                    List<DestinationPoint> values = mOriginalValues;
+                    int count = values.size();
+
+                    ArrayList<DestinationPoint> newValues = new ArrayList<DestinationPoint>(count);
+
+                    for (int i = 0; i < count; i++) {
+                        DestinationPoint destinationPoint = values.get(i);
+                        String destName = destinationPoint.name.toLowerCase();
+                        String destAlternativeName = destinationPoint.nameAlternative.toLowerCase();
+
+                        if (destName.startsWith(prefixString) || destAlternativeName.startsWith(prefixString)) {
+                            newValues.add(destinationPoint);
+                        } else {
+                            String[] destNameWords = trimSymbols(destName).split(" ");
+                            String[] destNameAlternativeWords = trimSymbols(destAlternativeName).split(" ");
+                            final int wordCount = destNameWords.length;
+
+                            // Start at index 0, in case valueText starts with space(s)
+                            for (int k = 0; k < wordCount; k++) {
+                                if (destNameWords[k].startsWith(prefixString) ||
+                                        destNameAlternativeWords[k].startsWith(prefixString)) {
+                                    newValues.add(destinationPoint);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    results.values = newValues;
+                    results.count = newValues.size();
+                }
+
+                return results;
+            }
+
+            private String trimSymbols(String text) {
+                return text.replace("(", "").replace(")", "").replace("-", " ");
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                if (results.values != null){
+                    mValues = (ArrayList<DestinationPoint>) results.values;
+                } else {
+                    mValues = new ArrayList<DestinationPoint>();
+                }
+                if (results.count > 0) {
+                    notifyDataSetChanged();
+                } else {
+                    notifyDataSetInvalidated();
+                }
+            }
         }
     }
 }

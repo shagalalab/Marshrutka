@@ -15,23 +15,31 @@
             style="@style/QueryByDestinationLabelText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textStyle="italic"
             android:text="@string/start_point" />
 
-        <Spinner
+        <AutoCompleteTextView
             android:id="@+id/spinner_start_point"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/choose_destination"
+            android:singleLine="true"/>
 
         <TextView
             style="@style/QueryByDestinationLabelText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textStyle="italic"
             android:text="@string/end_point" />
 
-        <Spinner
+        <AutoCompleteTextView
             android:id="@+id/spinner_end_point"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/choose_destination"
+            android:singleLine="true"/>
     </LinearLayout>
 
     <FrameLayout

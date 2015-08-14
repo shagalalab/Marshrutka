@@ -20,32 +20,39 @@ public class DestinationPoint {
         }
     }
 
-    public int ID;
-    private String nameCyr;
-    private String nameLat;
+    public final int ID;
+    public final String name;
+    // same strings as previous ones, but specific qq letters changed to normal english
+    // this is useful for autocomplete, as the input during autocomplete comes from
+    // soft keyboard where these specific letters may not be present
+    // i.e. "ә" -> "а", "ғ" -> "г", "a'" to "a", "u'" -> "u"
+    public final String nameAlternative;
 
-    public DestinationPoint() {
-    }
+    boolean isCyrillic;
 
-    public DestinationPoint(int id, String nameCyr, String nameLat) {
+    public DestinationPoint(boolean isCyrillic, int id, String name) {
+        this.isCyrillic = isCyrillic;
         this.ID = id;
-        this.nameCyr = nameCyr;
-        this.nameLat = nameLat;
+        this.name = name;
+        this.nameAlternative = isCyrillic ? slimCyr(name) : slimLat(name);
     }
 
-    public String getName(boolean isCyrillicInterface) {
-        if (isCyrillicInterface) {
-            return nameCyr;
-        } else {
-            return nameLat;
-        }
+    private String slimCyr(String name) {
+        return name.replace('ә', 'а').replace('ғ', 'г').replace('қ', 'к')
+                .replace('ң', 'н').replace('ө', 'о').replace('ү', 'у')
+                .replace('ў', 'у').replace('ҳ', 'х');
+    }
+
+    private String slimLat(String name) {
+        return name.replace("a'", "a").replace("g'", "g").replace("n'", "n")
+                .replace("o'", "o").replace("u'", "u");
     }
 
     public static final Comparator<DestinationPoint> QQ_CYR_COMPARATOR = new Comparator<DestinationPoint>() {
         @Override
         public int compare(DestinationPoint first, DestinationPoint second) {
-            char[] thisLowerCase = first.nameCyr.toLowerCase().toCharArray();
-            char[] thatLowerCase = second.nameCyr.toLowerCase().toCharArray();
+            char[] thisLowerCase = first.name.toLowerCase().toCharArray();
+            char[] thatLowerCase = second.name.toLowerCase().toCharArray();
 
             int len = Math.min(thisLowerCase.length, thatLowerCase.length);
             for (int i=0; i<len; i++) {
@@ -69,14 +76,14 @@ public class DestinationPoint {
                     return thisIndex - thatIndex;
                 }
             }
-            return first.nameCyr.compareTo(second.nameCyr);
+            return first.name.compareTo(second.name);
         }
     };
 
     public static final Comparator<DestinationPoint> QQ_LAT_COMPARATOR = new Comparator<DestinationPoint>() {
         @Override
         public int compare(DestinationPoint first, DestinationPoint second) {
-            return first.nameLat.compareTo(second.nameLat);
+            return first.name.compareTo(second.name);
         }
     };
 
@@ -87,6 +94,11 @@ public class DestinationPoint {
         if (!(that instanceof DestinationPoint)) return false;
 
         DestinationPoint thatPoint = (DestinationPoint)that;
-        return this.ID == thatPoint.ID && this.nameCyr.equals(thatPoint.nameCyr);
+        return this.ID == thatPoint.ID && this.name.equals(thatPoint.name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

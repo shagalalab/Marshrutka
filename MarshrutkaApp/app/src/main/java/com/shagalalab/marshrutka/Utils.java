@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
  */
 public class Utils {
     public static boolean NEED_RESTART = false;
+    public static boolean NEED_REFRESH_AUTOCOMPLETETEXT = false;
 
     public static void pendingRestartApp(Context context, Intent intent) {
         int mPendingIntentId = 123456;

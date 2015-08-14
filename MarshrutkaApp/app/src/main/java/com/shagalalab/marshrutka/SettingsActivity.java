@@ -69,8 +69,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         if (!mBindingPreference && !oldValue.equals(newValue)
             && preference.getKey().equals(getString(R.string.pref_interface_key))) {
 
-                Utils.NEED_RESTART = true;
-                finish();
+            Utils.NEED_RESTART = true;
+            Utils.NEED_REFRESH_AUTOCOMPLETETEXT = true;
+            finish();
         }
 
         if (preference instanceof ListPreference) {

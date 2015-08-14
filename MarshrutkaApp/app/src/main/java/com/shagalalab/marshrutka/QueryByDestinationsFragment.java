@@ -79,6 +79,16 @@ public class QueryByDestinationsFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Utils.NEED_REFRESH_AUTOCOMPLETETEXT) {
+            Utils.NEED_REFRESH_AUTOCOMPLETETEXT = false;
+            mEndPoint.setText("");
+            mStartPoint.setText("");
+        }
+    }
+
     private class StartPointItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         @Override

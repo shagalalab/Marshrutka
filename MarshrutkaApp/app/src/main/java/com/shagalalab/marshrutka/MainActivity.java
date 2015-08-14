@@ -91,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
         // invalidate data from DB to fetch right locale strings
         DbHelper.reset();
 
-
-
         // recreate() API is available only from API11
         // for older versions we need to perform alternative instructions
         if (Build.VERSION.SDK_INT == 10) {
@@ -140,17 +138,21 @@ public class MainActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        static final int QUERY_BY_NUMBER_FRAGMENT = 0;
+        static final int QUERY_BY_DESTINATION_FRAGMENT = 1;
+        Fragment[] fragments;
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            fragments = new Fragment[] {
+                    new QueryByNumberFragment(),
+                    new QueryByDestinationsFragment()
+            };
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 0) {
-                return new QueryByNumberFragment();
-            } else {
-                return new QueryByDestinationsFragment();
-            }
+            return fragments[position];
         }
 
         @Override

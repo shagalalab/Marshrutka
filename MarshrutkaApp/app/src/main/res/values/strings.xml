@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">Marshrutka</string>
     <string name="start_point">Басланғыш мәнзил:</string>
     <string name="end_point">Соңғы мәнзил:</string>
-    <string name="choose_destination"> ---- Мәнзилди сайлаң ---- </string>
+    <string name="choose_destination"> ---- Мәнзилди киритиң ---- </string>
     <string name="tab_text_numero_sign">№</string>
     <string name="tab_text_from_to">А -> Б</string>
 

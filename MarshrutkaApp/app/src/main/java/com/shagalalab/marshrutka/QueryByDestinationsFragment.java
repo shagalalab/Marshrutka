@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -52,7 +56,6 @@ public class QueryByDestinationsFragment extends Fragment {
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
                                                                        : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(mStartDestinationPoints, comparator);
-        //mStartDestinationPoints.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
 
         mStartPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_start_point);
         mEndPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_end_point);
@@ -60,23 +63,120 @@ public class QueryByDestinationsFragment extends Fragment {
         DestinationPointsAdapter startPointAdapter = new DestinationPointsAdapter(getActivity(),
                 0, mStartDestinationPoints);
 
-
-/*
-        String[] months = new String[] {
-                "January", "February", "March", "April", "May", "June"
-        };
-        ArrayAdapter<String> monthsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, months);
-        ArrayAdapter<DestinationPoint> destPoints = new ArrayAdapter<DestinationPoint>(getActivity(), android.R.layout.simple_list_item_1, mStartDestinationPoints);
-*/
-
         mStartPoint.setAdapter(startPointAdapter);
         mStartPoint.setThreshold(1);
+        mStartPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mStartPoint.hasFocus()) {
+                    showDropDownIfPossible(mStartPoint);
+                }
+            }
+        });
+        mStartPoint.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String selection = mStartPoint.getText().toString();
+                Integer destinationID = mDbHelper.destinationToIdMapping.get(selection);
+                if (destinationID == null) {
+                    mEndPoint.setAdapter(null);
+                    mListView.setAdapter(null);
+                } else {
+                    mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[destinationID].reachableDestinationIds);
+                    DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
+                            0, mEndDestinationPoints);
+                    mEndPoint.setAdapter(endPointAdapter);
+                    setListAdapter();
+                    //mEndPoint.requestFocus();
+                }
+            }
+        });
+        mStartPoint.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
 
-        mStartPoint.setOnItemSelectedListener(new StartPointItemSelectedListener());
-        mEndPoint.setOnItemSelectedListener(new EndPointItemSelectedListener());
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                Log.d("autocomplete", "START: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
+                if (before > 0 && charSequence.length() == 0) {
+                    // reset autocomplete's adapter when text is empty
+                    setListAdapter();
+                    showDropDownIfPossible(mStartPoint);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+
+        mEndPoint.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                setListAdapter();
+                hideKeyboard();
+            }
+        });
         mEndPoint.setThreshold(1);
+        mEndPoint.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                Log.d("autocomplete", "END: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
+                if (before > 0 && charSequence.length() == 0) {
+                    // reset autocomplete's adapter when text is empty
+                    setListAdapter();
+                    showDropDownIfPossible(mEndPoint);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        mEndPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mEndPoint.hasFocus()) {
+                    showDropDownIfPossible(mEndPoint);
+                }
+            }
+        });
+        mEndPoint.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    showDropDownIfPossible(mEndPoint);
+                }
+            }
+        });
 
         return view;
+    }
+
+    void showDropDownIfPossible(AutoCompleteTextView view) {
+        // showDropDown() method crashes when the given view is not attached to window
+        // (which happens when we change locale)
+        // isAttachedToWindow() method is available only from API19
+        // therefore it is possible to get the same effect by checking whether
+        // getWindowToken() returns null or not
+        if (view.getWindowToken() != null) {
+            view.showDropDown();
+        }
+    }
+
+    private void hideKeyboard() {
+        // Check if no view has focus:
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     @Override
@@ -89,57 +189,17 @@ public class QueryByDestinationsFragment extends Fragment {
         }
     }
 
-    private class StartPointItemSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-            String selection = mStartPoint.getText().toString();
-            Integer destinationID = mDbHelper.destinationToIdMapping.get(selection);
-            //int startPointID = mStartDestinationPoints.get(startPointPosition).ID;
-            if (destinationID == null) {
-                mEndPoint.setAdapter(null);
-                mListView.setAdapter(null);
-            } else {
-                mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[destinationID].reachableDestinationIds);
-                DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
-                        0, mEndDestinationPoints);
-                mEndPoint.setAdapter(endPointAdapter);
-                setListAdapter();
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-        }
-    }
-
-    private class EndPointItemSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-            setListAdapter();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-        }
-    }
-
     private void setListAdapter() {
         Integer startPointID = mDbHelper.destinationToIdMapping.get(mStartPoint.getText().toString());
         Integer endPointID = mDbHelper.destinationToIdMapping.get(mEndPoint.getText().toString());
 
         int[] routeIds;
-        /*if (startPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[endPointID].routeIds;
-        } else if (endPointID == -1) {
-            routeIds = mDbHelper.reverseRoutes[startPointID].routeIds;
-        } else {
-            routeIds = mergeRoutes(mDbHelper.reverseRoutes[endPointID].routeIds,
-                    mDbHelper.reverseRoutes[startPointID].routeIds);
-        }*/
-        if (startPointID == null || endPointID == null) {
+        if (startPointID == null && endPointID == null) {
             routeIds = new int[0];
+        } else if (startPointID == null) {
+            routeIds = mDbHelper.reverseRoutes[endPointID].routeIds;
+        } else if (endPointID == null) {
+            routeIds = mDbHelper.reverseRoutes[startPointID].routeIds;
         } else {
             routeIds = mergeRoutes(mDbHelper.reverseRoutes[startPointID].routeIds,
                                    mDbHelper.reverseRoutes[endPointID].routeIds);
@@ -169,7 +229,6 @@ public class QueryByDestinationsFragment extends Fragment {
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
                 : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(destinationPointList, comparator);
-        //destinationPointList.add(0, new DestinationPoint(-1, getString(R.string.choose_destination), getString(R.string.choose_destination)));
         return destinationPointList;
     }
 
@@ -271,9 +330,6 @@ public class QueryByDestinationsFragment extends Fragment {
                 if (prefix == null || prefix.length() == 0) {
                     synchronized (lock) {
                         ArrayList<DestinationPoint> list = new ArrayList<DestinationPoint>(mOriginalValues);
-                        /*for (DestinationPoint point : mOriginalValues) {
-                            list.add(point.getName(mIsInterfaceCyrillic));
-                        }*/
                         results.values = list;
                         results.count = list.size();
                     }

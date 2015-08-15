@@ -3,7 +3,7 @@
     <string name="action_settings">Sazlawlar</string>
     <string name="start_point">Baslang\'ısh ma\'nzil:</string>
     <string name="end_point">Son\'g\'ı ma\'nzil:</string>
-    <string name="choose_destination"> ---- Ma\'nzildi saylan\' ---- </string>
+    <string name="choose_destination"> ---- Ma\'nzildi kiritin\' ---- </string>
     <string name="tab_text_numero_sign">№</string>
     <string name="tab_text_from_to">A -> B</string>
 

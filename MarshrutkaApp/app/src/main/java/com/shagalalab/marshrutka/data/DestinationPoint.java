@@ -38,14 +38,14 @@ public class DestinationPoint {
     }
 
     private String slimCyr(String name) {
-        return name.replace('ә', 'а').replace('ғ', 'г').replace('қ', 'к')
+        return name.toLowerCase().replace('ә', 'а').replace('ғ', 'г').replace('қ', 'к')
                 .replace('ң', 'н').replace('ө', 'о').replace('ү', 'у')
                 .replace('ў', 'у').replace('ҳ', 'х');
     }
 
     private String slimLat(String name) {
-        return name.replace("a'", "a").replace("g'", "g").replace("n'", "n")
-                .replace("o'", "o").replace("u'", "u");
+        return name.toLowerCase().replace("a'", "a").replace("g'", "g").replace("n'", "n")
+                .replace("o'", "o").replace("u'", "u").replace("ı", "i");
     }
 
     public static final Comparator<DestinationPoint> QQ_CYR_COMPARATOR = new Comparator<DestinationPoint>() {

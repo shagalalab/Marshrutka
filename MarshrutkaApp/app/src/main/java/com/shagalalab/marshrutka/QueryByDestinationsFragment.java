@@ -13,12 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.Route;
@@ -28,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Created by aziz on 7/10/15.
@@ -87,7 +82,6 @@ public class QueryByDestinationsFragment extends Fragment {
                             0, mEndDestinationPoints);
                     mEndPoint.setAdapter(endPointAdapter);
                     setListAdapter();
-                    //mEndPoint.requestFocus();
                 }
             }
         });
@@ -255,141 +249,5 @@ public class QueryByDestinationsFragment extends Fragment {
             mergedRoutes[i] = merged.get(i);
         }
         return mergedRoutes;
-    }
-
-    private class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> implements Filterable {
-        LayoutInflater mInflater;
-        ArrayFilter mFilter;
-        List<DestinationPoint> mValues;
-        List<DestinationPoint> mOriginalValues;
-
-        public DestinationPointsAdapter(Context context, int resource, List<DestinationPoint> objects) {
-            super(context, resource, objects);
-            mInflater = LayoutInflater.from(context);
-            mValues = objects;
-            mOriginalValues = new ArrayList<DestinationPoint>(objects);
-        }
-
-        private View getCustomView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = mInflater.inflate(android.R.layout.simple_list_item_1, null);
-            }
-
-            String text = getItem(position).name;
-            ((TextView) convertView).setText(text);
-            return convertView;
-        }
-
-        @Override
-        public int getCount() {
-            return mValues.size();
-        }
-
-        @Override
-        public DestinationPoint getItem(int position) {
-            return mValues.get(position);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            return getCustomView(position, convertView, parent);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            return getCustomView(position, convertView, parent);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            DestinationPoint point = getItem(position);
-            return point.ID;
-        }
-
-        @Override
-        public Filter getFilter() {
-            if (mFilter == null) {
-                mFilter = new ArrayFilter();
-            }
-            return mFilter;
-        }
-
-        private class ArrayFilter extends Filter {
-            private Object lock = new Object();
-
-            @Override
-            protected FilterResults performFiltering(CharSequence prefix) {
-                FilterResults results = new FilterResults();
-
-                if (mOriginalValues == null) {
-                    synchronized (lock) {
-                        mOriginalValues = new ArrayList<DestinationPoint>(mValues);
-                    }
-                }
-
-                if (prefix == null || prefix.length() == 0) {
-                    synchronized (lock) {
-                        ArrayList<DestinationPoint> list = new ArrayList<DestinationPoint>(mOriginalValues);
-                        results.values = list;
-                        results.count = list.size();
-                    }
-                } else {
-                    final String prefixString = prefix.toString().toLowerCase();
-
-                    List<DestinationPoint> values = mOriginalValues;
-                    int count = values.size();
-
-                    ArrayList<DestinationPoint> newValues = new ArrayList<DestinationPoint>(count);
-
-                    for (int i = 0; i < count; i++) {
-                        DestinationPoint destinationPoint = values.get(i);
-                        String destName = destinationPoint.name.toLowerCase();
-                        String destAlternativeName = destinationPoint.nameAlternative.toLowerCase();
-
-                        if (destName.startsWith(prefixString) || destAlternativeName.startsWith(prefixString)) {
-                            newValues.add(destinationPoint);
-                        } else {
-                            String[] destNameWords = trimSymbols(destName).split(" ");
-                            String[] destNameAlternativeWords = trimSymbols(destAlternativeName).split(" ");
-                            final int wordCount = destNameWords.length;
-
-                            // Start at index 0, in case valueText starts with space(s)
-                            for (int k = 0; k < wordCount; k++) {
-                                if (destNameWords[k].startsWith(prefixString) ||
-                                        destNameAlternativeWords[k].startsWith(prefixString)) {
-                                    newValues.add(destinationPoint);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    results.values = newValues;
-                    results.count = newValues.size();
-                }
-
-                return results;
-            }
-
-            private String trimSymbols(String text) {
-                return text.replace("(", "").replace(")", "").replace("-", " ");
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-
-                if (results.values != null){
-                    mValues = (ArrayList<DestinationPoint>) results.values;
-                } else {
-                    mValues = new ArrayList<DestinationPoint>();
-                }
-                if (results.count > 0) {
-                    notifyDataSetChanged();
-                } else {
-                    notifyDataSetInvalidated();
-                }
-            }
-        }
     }
 }

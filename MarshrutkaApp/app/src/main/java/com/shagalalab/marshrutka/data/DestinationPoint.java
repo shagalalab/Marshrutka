@@ -21,29 +21,36 @@ public class DestinationPoint {
     }
 
     public final int ID;
-    public final String name;
-    // same strings as previous ones, but specific qq letters changed to normal english
-    // this is useful for autocomplete, as the input during autocomplete comes from
-    // soft keyboard where these specific letters may not be present
+    public final String nameCyr, nameLat;
+
+    // Same strings as previous ones, but specific qq letters changed to normal russian/english letters.
+    // This is useful for autocomplete, as the input during autocomplete comes from
+    // soft keyboard where these specific letters may not be present.
     // i.e. "ә" -> "а", "ғ" -> "г", "a'" to "a", "u'" -> "u"
-    public final String nameAlternative;
+    public final String nameCyrAlternative, nameLatAlternative;
 
-    boolean isCyrillic;
+    private final boolean isCyrillic;
 
-    public DestinationPoint(boolean isCyrillic, int id, String name) {
+    public DestinationPoint(boolean isCyrillic, int id, String nameCyr, String nameLat) {
         this.isCyrillic = isCyrillic;
         this.ID = id;
-        this.name = name;
-        this.nameAlternative = isCyrillic ? slimCyr(name) : slimLat(name);
+        this.nameCyr = nameCyr;
+        this.nameLat = nameLat;
+        this.nameCyrAlternative = generateAlternativeNameCyr(nameCyr);
+        this.nameLatAlternative = generateAlternativeNameLat(nameLat);
     }
 
-    private String slimCyr(String name) {
+    public String getName() {
+        return isCyrillic ? nameCyr : nameLat;
+    }
+
+    private String generateAlternativeNameCyr(String name) {
         return name.toLowerCase().replace('ә', 'а').replace('ғ', 'г').replace('қ', 'к')
                 .replace('ң', 'н').replace('ө', 'о').replace('ү', 'у')
                 .replace('ў', 'у').replace('ҳ', 'х');
     }
 
-    private String slimLat(String name) {
+    private String generateAlternativeNameLat(String name) {
         return name.toLowerCase().replace("a'", "a").replace("g'", "g").replace("n'", "n")
                 .replace("o'", "o").replace("u'", "u").replace("ı", "i");
     }
@@ -51,8 +58,8 @@ public class DestinationPoint {
     public static final Comparator<DestinationPoint> QQ_CYR_COMPARATOR = new Comparator<DestinationPoint>() {
         @Override
         public int compare(DestinationPoint first, DestinationPoint second) {
-            char[] thisLowerCase = first.name.toLowerCase().toCharArray();
-            char[] thatLowerCase = second.name.toLowerCase().toCharArray();
+            char[] thisLowerCase = first.nameCyr.toLowerCase().toCharArray();
+            char[] thatLowerCase = second.nameCyr.toLowerCase().toCharArray();
 
             int len = Math.min(thisLowerCase.length, thatLowerCase.length);
             for (int i=0; i<len; i++) {
@@ -76,14 +83,14 @@ public class DestinationPoint {
                     return thisIndex - thatIndex;
                 }
             }
-            return first.name.compareTo(second.name);
+            return first.nameCyr.compareTo(second.nameCyr);
         }
     };
 
     public static final Comparator<DestinationPoint> QQ_LAT_COMPARATOR = new Comparator<DestinationPoint>() {
         @Override
         public int compare(DestinationPoint first, DestinationPoint second) {
-            return first.name.compareTo(second.name);
+            return first.nameLat.compareTo(second.nameLat);
         }
     };
 
@@ -94,11 +101,11 @@ public class DestinationPoint {
         if (!(that instanceof DestinationPoint)) return false;
 
         DestinationPoint thatPoint = (DestinationPoint)that;
-        return this.ID == thatPoint.ID && this.name.equals(thatPoint.name);
+        return this.ID == thatPoint.ID && this.nameCyr.equals(thatPoint.nameCyr);
     }
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
 }

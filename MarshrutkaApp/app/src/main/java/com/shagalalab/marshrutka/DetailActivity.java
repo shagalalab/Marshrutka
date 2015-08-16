@@ -55,7 +55,7 @@ public class DetailActivity extends AppCompatActivity {
         final LinearLayout txtContainer = (LinearLayout)findViewById(R.id.destination_txt_container);
         ArrayList<DestinationPoint> pathPoints = currentRoute.pathPoints;
         for (DestinationPoint destinationPoint : pathPoints) {
-            txtContainer.addView(generateTextView(destinationPoint.name));
+            txtContainer.addView(generateTextView(destinationPoint.getName()));
         }
         final PathDrawer pathDrawer = (PathDrawer)findViewById(R.id.path_drawer);
         txtContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {

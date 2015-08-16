@@ -35,7 +35,7 @@ public class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> imp
             convertView = mInflater.inflate(android.R.layout.simple_list_item_1, null);
         }
 
-        String text = getItem(position).name;
+        String text = getItem(position).getName();
         ((TextView) convertView).setText(text);
         return convertView;
     }
@@ -103,20 +103,29 @@ public class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> imp
 
                 for (int i = 0; i < count; i++) {
                     DestinationPoint destinationPoint = values.get(i);
-                    String destName = destinationPoint.name.toLowerCase();
-                    String destAlternativeName = destinationPoint.nameAlternative.toLowerCase();
+                    String destNameCyr = destinationPoint.nameCyr.toLowerCase();
+                    String destAlternativeNameCyr = destinationPoint.nameCyrAlternative.toLowerCase();
 
-                    if (destName.startsWith(prefixString) || destAlternativeName.startsWith(prefixString)) {
+                    String destNameLat = destinationPoint.nameLat.toLowerCase();
+                    String destAlternativeNameLat = destinationPoint.nameLatAlternative.toLowerCase();
+
+                    if (destNameCyr.startsWith(prefixString) || destAlternativeNameCyr.startsWith(prefixString)
+                            || destNameLat.startsWith(prefixString) || destAlternativeNameLat.startsWith(prefixString)) {
                         newValues.add(destinationPoint);
                     } else {
-                        String[] destNameWords = trimSymbols(destName).split(" ");
-                        String[] destNameAlternativeWords = trimSymbols(destAlternativeName).split(" ");
-                        final int wordCount = destNameWords.length;
+                        String[] destNameCyrWords = trimSymbols(destNameCyr).split(" ");
+                        String[] destNameCyrAlternativeWords = trimSymbols(destAlternativeNameCyr).split(" ");
+                        String[] destNameLatWords = trimSymbols(destNameLat).split(" ");
+                        String[] destNameLatAlternativeWords = trimSymbols(destAlternativeNameLat).split(" ");
+
+                        final int wordCount = destNameCyrWords.length;
 
                         // Start at index 0, in case valueText starts with space(s)
                         for (int k = 0; k < wordCount; k++) {
-                            if (destNameWords[k].startsWith(prefixString) ||
-                                    destNameAlternativeWords[k].startsWith(prefixString)) {
+                            if (destNameCyrWords[k].startsWith(prefixString) ||
+                                    destNameCyrAlternativeWords[k].startsWith(prefixString) ||
+                                    destNameLatWords[k].startsWith(prefixString) ||
+                                    destNameLatAlternativeWords[k].startsWith(prefixString)) {
                                 newValues.add(destinationPoint);
                                 break;
                             }

@@ -285,7 +285,7 @@ public class DbHelper extends SQLiteOpenHelper {
             String name_cyr = cursor.getString(1);
             String name_lat = cursor.getString(2);
             DestinationPoint destinationPoint = new DestinationPoint(isInterfaceCyrillic, ID,
-                    isInterfaceCyrillic ? name_cyr : name_lat);
+                    name_cyr, name_lat);
             destinationPoints[ID] = destinationPoint;
             destinationToIdMapping.put(name_cyr, ID);
             destinationToIdMapping.put(name_lat, ID);

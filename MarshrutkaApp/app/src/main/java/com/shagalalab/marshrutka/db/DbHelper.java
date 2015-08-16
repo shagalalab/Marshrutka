@@ -58,7 +58,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private final String DB_PATH;
 
     private static final String DB_NAME = "marshrutka.db";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     private SQLiteDatabase mDataBase;
 

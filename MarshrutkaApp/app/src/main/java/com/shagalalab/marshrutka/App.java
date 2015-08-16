@@ -11,6 +11,7 @@ import java.util.Locale;
  * App-wide lifecycle events
  */
 public class App extends Application {
+    public static final String TAG = "marshrutka";
     private Locale CYRILLIC, LATIN;
     private boolean isLocaleCyrillic = true;
 

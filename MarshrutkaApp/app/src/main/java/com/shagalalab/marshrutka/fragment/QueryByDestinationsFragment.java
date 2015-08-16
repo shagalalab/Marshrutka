@@ -189,8 +189,8 @@ public class QueryByDestinationsFragment extends Fragment {
     }
 
     private void setListAdapter() {
-        Integer startPointID = mDbHelper.destinationToIdMapping.get(mStartPoint.getText().toString());
-        Integer endPointID = mDbHelper.destinationToIdMapping.get(mEndPoint.getText().toString());
+        final Integer startPointID = mDbHelper.destinationToIdMapping.get(mStartPoint.getText().toString());
+        final Integer endPointID = mDbHelper.destinationToIdMapping.get(mEndPoint.getText().toString());
 
         int[] routeIds;
         if (startPointID == null && endPointID == null) {
@@ -215,6 +215,19 @@ public class QueryByDestinationsFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 intent.putExtra(DetailActivity.ROUTE_ID, filteredRoutes[position].ID);
+                int[] chosenDestinationInterval;
+                if (startPointID == null && endPointID == null) {
+                    chosenDestinationInterval = null;
+                } else if (startPointID == null) {
+                    chosenDestinationInterval = new int[] {endPointID};
+                } else if (endPointID == null) {
+                    chosenDestinationInterval = new int[] {startPointID};
+                } else {
+                    chosenDestinationInterval = new int[] {startPointID, endPointID};
+                }
+                if (chosenDestinationInterval != null) {
+                    intent.putExtra(DetailActivity.CHOSEN_DESTINATIONS_INTERVAL, chosenDestinationInterval);
+                }
                 startActivity(intent);
             }
         });

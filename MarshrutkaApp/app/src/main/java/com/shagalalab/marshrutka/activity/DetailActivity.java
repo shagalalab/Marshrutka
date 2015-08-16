@@ -73,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
             public boolean onPreDraw() {
                 txtContainer.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                pathDrawer.initDrawing(txtContainer);
+                pathDrawer.initDrawing(txtContainer, selectionIndices);
                 pathDrawer.invalidate();
                 return true;
             }

@@ -47,7 +47,8 @@ public class DestinationPoint {
     private String generateAlternativeNameCyr(String name) {
         return name.toLowerCase().replace('ә', 'а').replace('ғ', 'г').replace('қ', 'к')
                 .replace('ң', 'н').replace('ө', 'о').replace('ү', 'у')
-                .replace('ў', 'у').replace('ҳ', 'х');
+                .replace('ў', 'у').replace('ҳ', 'х').replace('ё', 'е')
+                .replace("ь", "").replace("ъ", "");
     }
 
     private String generateAlternativeNameLat(String name) {

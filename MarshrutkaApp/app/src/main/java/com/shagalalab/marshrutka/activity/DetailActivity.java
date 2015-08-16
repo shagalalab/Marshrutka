@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,8 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.shagalalab.marshrutka.App;
+import com.shagalalab.marshrutka.R;
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.Route;
 import com.shagalalab.marshrutka.db.DbHelper;

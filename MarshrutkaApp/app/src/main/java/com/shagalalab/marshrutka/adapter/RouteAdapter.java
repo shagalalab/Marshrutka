@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import com.shagalalab.marshrutka.R;
 import com.shagalalab.marshrutka.data.Route;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.LinkedHashMap;
 /**
  * Created by aziz on 7/11/15.
  */
-public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionIndexer {
+public class RouteAdapter extends ArrayAdapter<Route> implements SectionIndexer {
 
     private LayoutInflater mInflater;
     private String[] sections;
@@ -24,7 +25,7 @@ public class DestinationsAdapter extends ArrayAdapter<Route> implements SectionI
     private String mBusShortenedLabel;
     private boolean mIsInterfaceCyrillic;
 
-    public DestinationsAdapter(Context context, int resource, Route[] objects, boolean isInterfaceCyrillic) {
+    public RouteAdapter(Context context, int resource, Route[] objects, boolean isInterfaceCyrillic) {
         super(context, resource, objects);
         mInflater = LayoutInflater.from(context);
         mIsInterfaceCyrillic = isInterfaceCyrillic;

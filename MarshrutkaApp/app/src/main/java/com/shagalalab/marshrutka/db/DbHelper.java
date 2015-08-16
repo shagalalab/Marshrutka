@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.shagalalab.marshrutka.App;
-import com.shagalalab.marshrutka.Utils;
+import com.shagalalab.marshrutka.util.Utils;
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.ReachableDestinations;
 import com.shagalalab.marshrutka.data.ReverseRoute;

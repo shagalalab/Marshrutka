@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,15 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 
+import com.shagalalab.marshrutka.App;
+import com.shagalalab.marshrutka.R;
+import com.shagalalab.marshrutka.activity.DetailActivity;
+import com.shagalalab.marshrutka.adapter.DestinationPointAdapter;
+import com.shagalalab.marshrutka.adapter.RouteAdapter;
 import com.shagalalab.marshrutka.data.DestinationPoint;
 import com.shagalalab.marshrutka.data.Route;
 import com.shagalalab.marshrutka.db.DbHelper;
+import com.shagalalab.marshrutka.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +60,7 @@ public class QueryByDestinationsFragment extends Fragment {
         mStartPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_start_point);
         mEndPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_end_point);
 
-        DestinationPointsAdapter startPointAdapter = new DestinationPointsAdapter(getActivity(),
+        DestinationPointAdapter startPointAdapter = new DestinationPointAdapter(getActivity(),
                 0, mStartDestinationPoints);
 
         mStartPoint.setAdapter(startPointAdapter);
@@ -78,7 +83,7 @@ public class QueryByDestinationsFragment extends Fragment {
                     mListView.setAdapter(null);
                 } else {
                     mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[destinationID].reachableDestinationIds);
-                    DestinationPointsAdapter endPointAdapter = new DestinationPointsAdapter(getActivity(),
+                    DestinationPointAdapter endPointAdapter = new DestinationPointAdapter(getActivity(),
                             0, mEndDestinationPoints);
                     mEndPoint.setAdapter(endPointAdapter);
                     setListAdapter();
@@ -92,7 +97,7 @@ public class QueryByDestinationsFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                Log.d("autocomplete", "START: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
+                //Log.d("autocomplete", "START: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
                 if (before > 0 && charSequence.length() == 0) {
                     // reset autocomplete's adapter when text is empty
                     setListAdapter();
@@ -121,7 +126,7 @@ public class QueryByDestinationsFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                Log.d("autocomplete", "END: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
+                //Log.d("autocomplete", "END: charseq="+charSequence+", start="+start+", before="+before+", count="+count);
                 if (before > 0 && charSequence.length() == 0) {
                     // reset autocomplete's adapter when text is empty
                     setListAdapter();
@@ -203,7 +208,7 @@ public class QueryByDestinationsFragment extends Fragment {
         for (int i = 0; i < routesCount; i++) {
             filteredRoutes[i] = mDbHelper.routes[routeIds[i]];
         }
-        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, filteredRoutes, mIsInterfaceCyrillic);
+        RouteAdapter adapter = new RouteAdapter(getActivity(), 0, filteredRoutes, mIsInterfaceCyrillic);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

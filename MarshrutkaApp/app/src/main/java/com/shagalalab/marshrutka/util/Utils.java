@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.util;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.shagalalab.marshrutka.R;
 
 /**
  * Created by aziz on 7/20/15.

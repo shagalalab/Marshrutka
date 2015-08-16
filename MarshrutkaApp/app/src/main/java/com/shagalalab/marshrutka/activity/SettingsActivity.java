@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.activity;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -6,6 +6,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
+import com.shagalalab.marshrutka.R;
+import com.shagalalab.marshrutka.util.Utils;
 import com.shagalalab.marshrutka.widget.AppCompatPreferenceActivity;
 
 /**

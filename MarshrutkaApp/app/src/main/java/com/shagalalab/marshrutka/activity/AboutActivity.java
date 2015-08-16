@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.activity;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
+
+import com.shagalalab.marshrutka.R;
 
 public class AboutActivity extends AppCompatActivity {
     private static String WEB_SITE = "http://www.shagalalab.com/";

@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,6 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.shagalalab.marshrutka.App;
+import com.shagalalab.marshrutka.fragment.QueryByDestinationsFragment;
+import com.shagalalab.marshrutka.fragment.QueryByNumberFragment;
+import com.shagalalab.marshrutka.R;
+import com.shagalalab.marshrutka.util.Utils;
 import com.shagalalab.marshrutka.db.DbHelper;
 import com.shagalalab.marshrutka.widget.SlidingTabLayout;
 

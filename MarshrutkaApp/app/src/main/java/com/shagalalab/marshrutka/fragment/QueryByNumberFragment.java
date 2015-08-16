@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.shagalalab.marshrutka.R;
+import com.shagalalab.marshrutka.adapter.RouteAdapter;
+import com.shagalalab.marshrutka.App;
+import com.shagalalab.marshrutka.activity.DetailActivity;
 import com.shagalalab.marshrutka.db.DbHelper;
 
 /**
@@ -28,7 +32,7 @@ public class QueryByNumberFragment extends Fragment {
         DbHelper dbHelper = DbHelper.getInstance(getActivity());
 
         boolean isInterfaceCyrillic = ((App)getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
-        DestinationsAdapter adapter = new DestinationsAdapter(getActivity(), 0, dbHelper.routes, isInterfaceCyrillic);
+        RouteAdapter adapter = new RouteAdapter(getActivity(), 0, dbHelper.routes, isInterfaceCyrillic);
         mListView.setAdapter(adapter);
         mListView.setFastScrollEnabled(true);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -1,4 +1,4 @@
-package com.shagalalab.marshrutka;
+package com.shagalalab.marshrutka.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,13 +17,13 @@ import java.util.List;
 /**
  * Created by aziz on 8/16/15.
  */
-public class DestinationPointsAdapter extends ArrayAdapter<DestinationPoint> implements Filterable {
+public class DestinationPointAdapter extends ArrayAdapter<DestinationPoint> implements Filterable {
     LayoutInflater mInflater;
     ArrayFilter mFilter;
     List<DestinationPoint> mValues;
     List<DestinationPoint> mOriginalValues;
 
-    public DestinationPointsAdapter(Context context, int resource, List<DestinationPoint> objects) {
+    public DestinationPointAdapter(Context context, int resource, List<DestinationPoint> objects) {
         super(context, resource, objects);
         mInflater = LayoutInflater.from(context);
         mValues = objects;

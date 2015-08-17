@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -74,21 +75,40 @@ public class PathDrawer extends View {
         }
 
         if (selectionIndices[0] >= 0) {
-            int parentRight = ((View)getParent()).getRight();
 
             View textViewTop = linearLayout.getChildAt(selectionIndices[0]);
-            int top = textViewTop.getTop();
-            int bottom = textViewTop.getBottom();
-            mSelectionPath.moveTo(getMeasuredWidth() / 2f, (top + bottom) / 2f);
-            mSelectionPath.lineTo(getMeasuredWidth(), top);
-            mSelectionPath.lineTo(parentRight, top);
+            int upperTextViewTop = textViewTop.getTop();
+            int upperTextViewBottom = textViewTop.getBottom();
+            int textViewWidth = textViewTop.getWidth()-1;
+            int textViewHeight = textViewTop.getHeight();
 
             View textViewBottom = linearLayout.getChildAt(selectionIndices[1]);
-            top = textViewBottom.getTop();
-            bottom = textViewBottom.getBottom();
-            mSelectionPath.lineTo(parentRight, bottom);
-            mSelectionPath.lineTo(getMeasuredWidth(), bottom);
-            mSelectionPath.lineTo(getMeasuredWidth() / 2f, (top + bottom) / 2f);
+            int lowerTextViewTop = textViewBottom.getTop();
+            int lowerTextViewBottom = textViewBottom.getBottom();
+
+            mSelectionPath.moveTo(getMeasuredWidth() / 2f, (upperTextViewTop + upperTextViewBottom) / 2f);
+
+            RectF topLeftRect = new RectF(getMeasuredWidth()/2f, upperTextViewTop,
+                                        getMeasuredWidth()*1.5f, upperTextViewBottom);
+            mSelectionPath.arcTo(topLeftRect, 180, 90);
+
+            RectF topRightRect = new RectF(getMeasuredWidth()+textViewWidth - textViewHeight,
+                    upperTextViewTop,
+                    getMeasuredWidth()+textViewWidth,
+                    upperTextViewBottom);
+            
+            mSelectionPath.arcTo(topRightRect, 270, 90);
+
+            RectF bottomRightRect = new RectF(getMeasuredWidth()+textViewWidth-textViewHeight,
+                    lowerTextViewTop,
+                    getMeasuredWidth()+textViewWidth,
+                    lowerTextViewBottom);
+
+            mSelectionPath.arcTo(bottomRightRect, 0, 90);
+
+            RectF bottomLeftRect = new RectF(getMeasuredWidth()/2f, lowerTextViewTop,
+                                    getMeasuredWidth()*1.5f, lowerTextViewBottom);
+            mSelectionPath.arcTo(bottomLeftRect, 90, 90);
             mSelectionPath.close();
         }
     }

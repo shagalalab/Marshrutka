@@ -96,7 +96,7 @@ public class PathDrawer extends View {
                     upperTextViewTop,
                     getMeasuredWidth()+textViewWidth,
                     upperTextViewBottom);
-            
+
             mSelectionPath.arcTo(topRightRect, 270, 90);
 
             RectF bottomRightRect = new RectF(getMeasuredWidth()+textViewWidth-textViewHeight,

@@ -41,124 +41,143 @@ def createDb(dbfilename):
 	conn.commit()
 	conn.close()
 
-def fillDb(dbfilename, csvfile):
-	with codecs.open(csvfile, 'r', encoding='utf8') as f:
-	
-		conn = sqlite3.connect(dbfilename)
-		c = conn.cursor()
+def fillDb(dbfilename, csvfile_in, csvfolder_out):
+	with codecs.open(csvfile_in, 'r', encoding='utf-8') as file_in:
+		with codecs.open(csvfolder_out+"/destinations.csv", 'w', encoding='utf-8') as file_out_destinations:
+			with codecs.open(csvfolder_out+"/reachabledestinations.csv", 'w', encoding='utf-8') as file_out_reachabledestinations:
+				with codecs.open(csvfolder_out+"/reverseroutes.csv", 'w', encoding='utf-8') as file_out_reverseroutes:
+					with codecs.open(csvfolder_out+"/routes.csv", 'w', encoding='utf-8') as file_out_routes:
 
-		# dict with keys corresponding to destination names, 
-		# and values to destination IDs
-		destinations = {}
-		#destinationCounts = {}
+						conn = sqlite3.connect(dbfilename)
+						c = conn.cursor()
 
-		# dict with keys corresponding to destination IDs,
-		# and values to list of route IDs
-		reverseroutes = {}
+						# dict with keys corresponding to destination names, 
+						# and values to destination IDs
+						destinations = {}
+						#destinationCounts = {}
 
-		# dict with keys corresponding to destination IDs,
-		# and values to set of reachible destination IDs
-		reachabledestinations = {}
+						# dict with keys corresponding to destination IDs,
+						# and values to list of route IDs
+						reverseroutes = {}
 
-		counter = -1
-		routeIdCounter = 0
+						# dict with keys corresponding to destination IDs,
+						# and values to set of reachible destination IDs
+						reachabledestinations = {}
 
-		for line in f:
-			# skip first line
-			if counter == -1:
-				counter = 0
-				continue;
+						counter = -1
+						routeIdCounter = 0
 
-			chunks = line.split(',')
-			# transport type is 1 if it is BUS, 0 if it is MARSHRUTKA
-			transportType = 1 if chunks[1] == 'TRUE' else 0
-			displaynumber = int(chunks[2])
-			routedescription = chunks[3].strip()
+						file_out_routes.write(u"id, isBus, displayNumber, description, pathPointIds\n")
 
-			points = []
-			for i in xrange(4, len(chunks)):
-				destination = chunks[i].strip()
-				# when next destination is empty, break it
-				if not destination:
-					break;
-				points.append(destination)
+						for line in file_in:
+							# skip first line
+							if counter == -1:
+								counter = 0
+								continue;
 
-			for point in points:
-				if not point:
-					raise ValueError('destination point should not be empty', points)
-				if not destinations.has_key(point):
-					destinations[point] = counter
-					# print destinations[points[i]], points[i]
-					counter += 1
-				if destinationCounts.has_key(point):
-					destinationCounts[point] = destinationCounts[point] + 1
-				else:
-					destinationCounts[point] = 1
+							chunks = line.split(',')
+							# transport type is 1 if it is BUS, 0 if it is MARSHRUTKA
+							transportType = 1 if chunks[1] == 'TRUE' else 0
+							displaynumber = int(chunks[2])
+							routedescription = chunks[3].strip()
 
-			point_ids = []
-			for i in xrange(len(points)):
-				point_ids.append(destinations[points[i]])
+							points = []
+							for i in xrange(4, len(chunks)):
+								destination = chunks[i].strip()
+								# when next destination is empty, break it
+								if not destination:
+									break;
+								points.append(destination)
 
-			pathPointIds = ','.join(map(str, point_ids))
+							for point in points:
+								if not point:
+									raise ValueError('destination point should not be empty', points)
+								if not destinations.has_key(point):
+									destinations[point] = counter
+									# print destinations[points[i]], points[i]
+									counter += 1
+								if destinationCounts.has_key(point):
+									destinationCounts[point] = destinationCounts[point] + 1
+								else:
+									destinationCounts[point] = 1
 
-			print line
-			#print points
-			print point_ids
-			# print 'type=', transportType, ', displaynumber=',displaynumber
+							point_ids = []
+							for i in xrange(len(points)):
+								point_ids.append(destinations[points[i]])
 
-			c.execute('''INSERT INTO routes (id, type, displaynumber,  description_cyr, description_lat, pathPointIds)
-						 VALUES (?, ?, ?, ?, ?, ?)''', \
-						  (routeIdCounter, transportType, displaynumber, routedescription, 
-						   cyrToLatConvertor(routedescription), pathPointIds))
-			lastrowid = routeIdCounter
-			# print 'lastrowid=',lastrowid
+							pathPointIds = ','.join(map(str, point_ids))
 
-			for i in xrange(len(points)):
+							print line
+							#print points
+							print point_ids
+							# print 'type=', transportType, ', displaynumber=',displaynumber
 
-				# add reverse routes
-				if reverseroutes.has_key(point_ids[i]):
-					reverseroutes[point_ids[i]].append(lastrowid)
-				else:
-					reverseroutes[point_ids[i]] = [lastrowid]
+							c.execute('''INSERT INTO routes (id, type, displaynumber,  description_cyr, description_lat, pathPointIds)
+										 VALUES (?, ?, ?, ?, ?, ?)''', \
+										  (routeIdCounter, transportType, displaynumber, routedescription, 
+										   cyrToLatConvertor(routedescription), pathPointIds))
 
-				# add all destinations in current path to each of destinations as reachable
-				if not reachabledestinations.has_key(point_ids[i]):
-					reachabledestinations[point_ids[i]] = set()
-				for j in xrange(len(points)):
-					reachabledestinations[point_ids[i]].add(point_ids[j])
+							file_out_routes.write(u"{id}, {isBus}, {displayNo}, {desc}, {pathpointids}\n".format(id=routeIdCounter,
+								isBus=('true' if transportType == 1 else 'false'), displayNo=displaynumber, desc=routedescription,
+								pathpointids=pathPointIds))
 
-			routeIdCounter += 1
+							lastrowid = routeIdCounter
+							# print 'lastrowid=',lastrowid
 
-		destination_arr = [''] * len(destinations)
-		for name in destinations.keys():
-			destination_arr[destinations[name]] = name
+							for i in xrange(len(points)):
 
-		for idx, name in enumerate(destination_arr):
-			#print name, type(name)
-			c.execute('''INSERT INTO destinations (id, name_cyr, name_lat) VALUES (?, ?, ?)''', (idx, name, cyrToLatConvertor(name)))
+								# add reverse routes
+								if reverseroutes.has_key(point_ids[i]):
+									reverseroutes[point_ids[i]].append(lastrowid)
+								else:
+									reverseroutes[point_ids[i]] = [lastrowid]
 
-		print "reverse routes"
-		printLines()
-		for destId in reverseroutes.keys():
-			routeIds = map(str, reverseroutes[destId])
-			c.execute('''INSERT INTO reverseroutes (destinationId, routeIds) VALUES (?, ?)''',\
-							(destId, ','.join(routeIds)))
-			print destId, ','.join(routeIds)
+								# add all destinations in current path to each of destinations as reachable
+								if not reachabledestinations.has_key(point_ids[i]):
+									reachabledestinations[point_ids[i]] = set()
+								for j in xrange(len(points)):
+									reachabledestinations[point_ids[i]].add(point_ids[j])
 
-		printLines()
-		print "reachable destinations"
-		printLines()
-		for destId in reachabledestinations.keys():
-			# remove self
-			reachabledestinations[destId] -= set([destId])
+							routeIdCounter += 1
 
-			reachibledestinationIds = map(str, reachabledestinations[destId])
-			c.execute('''INSERT INTO reachabledestinations (destinationId, reachableDestinationIds)
-						 VALUES (?, ?)''', (destId, ','.join(reachibledestinationIds)))
-			print destId, ','.join(reachibledestinationIds)
-			
-		conn.commit()
-		conn.close()
+						destination_arr = [''] * len(destinations)
+						for name in destinations.keys():
+							destination_arr[destinations[name]] = name
+
+						file_out_destinations.write(u"id, name\n")
+						for idx, name in enumerate(destination_arr):
+							#print name, type(name)
+							c.execute('''INSERT INTO destinations (id, name_cyr, name_lat) VALUES (?, ?, ?)''', (idx, name, cyrToLatConvertor(name)))
+							file_out_destinations.write(u"{id}, {name}\n".format(id=idx, name=name))
+
+						print "reverse routes"
+						printLines()
+
+						file_out_reverseroutes.write(u"destinationId, routeIds\n")
+						for destId in reverseroutes.keys():
+							routeIds = ','.join(map(str, reverseroutes[destId]))
+							c.execute('''INSERT INTO reverseroutes (destinationId, routeIds) VALUES (?, ?)''',\
+											(destId, routeIds))
+							file_out_reverseroutes.write(u"{destinationId}, {routeIds}\n".format(destinationId=destId, routeIds=routeIds))
+							print destId, ','.join(routeIds)
+
+						printLines()
+						print "reachable destinations"
+						printLines()
+						file_out_reachabledestinations.write(u"destinationId, reachableDestinationIds\n")
+						for destId in reachabledestinations.keys():
+							# remove self
+							reachabledestinations[destId] -= set([destId])
+
+							reachibleDestinationIds = ','.join(map(str, reachabledestinations[destId]))
+							c.execute('''INSERT INTO reachabledestinations (destinationId, reachableDestinationIds)
+										 VALUES (?, ?)''', (destId, reachibleDestinationIds))
+							file_out_reachabledestinations.write(u"{destinationId}, {reachableDestinationIds}\n".format(
+											destinationId=destId, reachableDestinationIds=reachibleDestinationIds))
+							print destId, reachibleDestinationIds
+							
+						conn.commit()
+						conn.close()
 
 def printData(dbfilename):
 	conn = sqlite3.connect(dbfilename)
@@ -452,9 +471,10 @@ def cyrToLatConvertor(text):
     return text
 
 if __name__ == '__main__':
-	dbfilename = 'marshrutka.db'
-	createDb(dbfilename)
-	fillDb(dbfilename, 'marshrutka_detailed.csv')
-	printData(dbfilename)
-	printReverseData(dbfilename)
-	printReachableDestinations(dbfilename)
+	dbfile_android = 'marshrutka.db'
+	csvfolder_ios = 'ios_data_model'
+	createDb(dbfile_android)
+	fillDb(dbfile_android, 'marshrutka_detailed.csv', csvfolder_ios)
+	printData(dbfile_android)
+	printReverseData(dbfile_android)
+	printReachableDestinations(dbfile_android)

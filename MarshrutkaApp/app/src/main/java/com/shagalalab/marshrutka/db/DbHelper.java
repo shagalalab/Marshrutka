@@ -138,7 +138,7 @@ public class DbHelper extends SQLiteOpenHelper {
             }
         }
 
-        return checkDB != null ? true : false;
+        return checkDB != null;
     }
 
     /**
@@ -195,7 +195,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(TAG, "DbHelper.onUpgrade() oldVersion="+oldVersion+", newVersion="+newVersion);
+        Log.d(TAG, "DbHelper.onUpgrade() oldVersion=" + oldVersion + ", newVersion=" + newVersion);
     }
 
     // Add your public helper methods to access and get content from the database.
@@ -224,14 +224,14 @@ public class DbHelper extends SQLiteOpenHelper {
         int count = getCount(TABLE_ROUTES);
         routes = new Route[count];
         Cursor cursor = mDataBase.query(TABLE_ROUTES,
-                        new String[] {
-                            COLUMN_ROUTES_ID,
-                            COLUMN_ROUTES_TYPE,
-                            COLUMN_ROUTES_DISPLAYNO,
-                            COLUMN_ROUTES_DESCRIPTION_CYR,
-                            COLUMN_ROUTES_DESCRIPTION_LAT,
-                            COLUMN_ROUTES_PATHPOINTIDS
-                        }, null, null, null, null, null);
+            new String[]{
+                COLUMN_ROUTES_ID,
+                COLUMN_ROUTES_TYPE,
+                COLUMN_ROUTES_DISPLAYNO,
+                COLUMN_ROUTES_DESCRIPTION_CYR,
+                COLUMN_ROUTES_DESCRIPTION_LAT,
+                COLUMN_ROUTES_PATHPOINTIDS
+            }, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
             Route route = new Route();
@@ -244,12 +244,12 @@ public class DbHelper extends SQLiteOpenHelper {
             int len = pathPointIds.length;
             ArrayList<DestinationPoint> destPoints = new ArrayList<>();
             Stack<Integer> destPointStack = new Stack<>();
-            for (int i=0; i<len; i++) {
+            for (int i = 0; i < len; i++) {
                 Integer destinationPointId = Integer.parseInt(pathPointIds[i]);
                 destPoints.add(destinationPoints[destinationPointId]);
                 if (i == len - 1) {
                     if (destPointStack.contains(destinationPointId)) {
-                        while (!destPointStack.pop().equals(destinationPointId));
+                        while (!destPointStack.pop().equals(destinationPointId)) ;
                     } else {
                         destPointStack.clear();
                     }
@@ -270,22 +270,22 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private void loadDestinationPoints() {
 
-        boolean isInterfaceCyrillic = ((App)mContext.getApplicationContext()).isCurrentLocaleCyrillic();
+        boolean isInterfaceCyrillic = ((App) mContext.getApplicationContext()).isCurrentLocaleCyrillic();
 
         int count = getCount(TABLE_DESTINATIONS);
         destinationPoints = new DestinationPoint[count];
         Cursor cursor = mDataBase.query(TABLE_DESTINATIONS,
-                        new String[] {
-                                COLUMN_DESTINATIONS_ID,
-                                COLUMN_DESTINATIONS_NAME_CYR,
-                                COLUMN_DESTINATIONS_NAME_LAT
-                        }, null, null, null, null, null);
+            new String[]{
+                COLUMN_DESTINATIONS_ID,
+                COLUMN_DESTINATIONS_NAME_CYR,
+                COLUMN_DESTINATIONS_NAME_LAT
+            }, null, null, null, null, null);
         while (cursor.moveToNext()) {
             int ID = cursor.getInt(0);
             String name_cyr = cursor.getString(1);
             String name_lat = cursor.getString(2);
             DestinationPoint destinationPoint = new DestinationPoint(isInterfaceCyrillic, ID,
-                    name_cyr, name_lat);
+                name_cyr, name_lat);
             destinationPoints[ID] = destinationPoint;
             destinationToIdMapping.put(name_cyr, ID);
             destinationToIdMapping.put(name_lat, ID);
@@ -297,10 +297,10 @@ public class DbHelper extends SQLiteOpenHelper {
         int count = getCount(TABLE_REVERSEROUTES);
         reverseRoutes = new ReverseRoute[count];
         Cursor cursor = mDataBase.query(TABLE_REVERSEROUTES,
-                        new String[] {
-                                COLUMN_REVERSEROUTES_DESTIONATIONID,
-                                COLUMN_REVERSEROUTES_ROUTEIDS
-                        }, null, null, null, null, null);
+            new String[]{
+                COLUMN_REVERSEROUTES_DESTIONATIONID,
+                COLUMN_REVERSEROUTES_ROUTEIDS
+            }, null, null, null, null, null);
         while (cursor.moveToNext()) {
             int destinationID = cursor.getInt(0);
             String routeIds = cursor.getString(1);
@@ -314,10 +314,10 @@ public class DbHelper extends SQLiteOpenHelper {
         int count = getCount(TABLE_REACHABLEDESTINATIONS);
         reachableDestinations = new ReachableDestinations[count];
         Cursor cursor = mDataBase.query(TABLE_REACHABLEDESTINATIONS,
-                new String[]{
-                        COLUMN_REACHABLEDESTINATIONS_DESTINATIONID,
-                        COLUMN_REACHABLEDESTINATIONS_REACHABLEDESTINATIONIDS
-                }, null, null, null, null, null);
+            new String[]{
+                COLUMN_REACHABLEDESTINATIONS_DESTINATIONID,
+                COLUMN_REACHABLEDESTINATIONS_REACHABLEDESTINATIONIDS
+            }, null, null, null, null, null);
         while (cursor.moveToNext()) {
             int destinationID = cursor.getInt(0);
             String reachableDestinationIds = cursor.getString(1);

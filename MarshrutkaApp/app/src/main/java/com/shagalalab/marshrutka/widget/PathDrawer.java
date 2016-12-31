@@ -67,7 +67,7 @@ public class PathDrawer extends View {
 
         // we already know that linearLayout has only TextView-type children
         int childCount = linearLayout.getChildCount();
-        for (int i=0; i<childCount; i++) {
+        for (int i = 0; i < childCount; i++) {
             View textView = linearLayout.getChildAt(i);
             int top = textView.getTop();
             int bottom = textView.getBottom();
@@ -79,7 +79,7 @@ public class PathDrawer extends View {
             View textViewTop = linearLayout.getChildAt(selectionIndices[0]);
             int upperTextViewTop = textViewTop.getTop();
             int upperTextViewBottom = textViewTop.getBottom();
-            int textViewWidth = textViewTop.getWidth()-1;
+            int textViewWidth = textViewTop.getWidth() - 1;
             int textViewHeight = textViewTop.getHeight();
 
             View textViewBottom = linearLayout.getChildAt(selectionIndices[1]);
@@ -88,26 +88,26 @@ public class PathDrawer extends View {
 
             mSelectionPath.moveTo(getMeasuredWidth() / 2f, (upperTextViewTop + upperTextViewBottom) / 2f);
 
-            RectF topLeftRect = new RectF(getMeasuredWidth()/2f, upperTextViewTop,
-                                        getMeasuredWidth()*1.5f, upperTextViewBottom);
+            RectF topLeftRect = new RectF(getMeasuredWidth() / 2f, upperTextViewTop,
+                getMeasuredWidth() * 1.5f, upperTextViewBottom);
             mSelectionPath.arcTo(topLeftRect, 180, 90);
 
-            RectF topRightRect = new RectF(getMeasuredWidth()+textViewWidth - textViewHeight,
-                    upperTextViewTop,
-                    getMeasuredWidth()+textViewWidth,
-                    upperTextViewBottom);
+            RectF topRightRect = new RectF(getMeasuredWidth() + textViewWidth - textViewHeight,
+                upperTextViewTop,
+                getMeasuredWidth() + textViewWidth,
+                upperTextViewBottom);
 
             mSelectionPath.arcTo(topRightRect, 270, 90);
 
-            RectF bottomRightRect = new RectF(getMeasuredWidth()+textViewWidth-textViewHeight,
-                    lowerTextViewTop,
-                    getMeasuredWidth()+textViewWidth,
-                    lowerTextViewBottom);
+            RectF bottomRightRect = new RectF(getMeasuredWidth() + textViewWidth - textViewHeight,
+                lowerTextViewTop,
+                getMeasuredWidth() + textViewWidth,
+                lowerTextViewBottom);
 
             mSelectionPath.arcTo(bottomRightRect, 0, 90);
 
-            RectF bottomLeftRect = new RectF(getMeasuredWidth()/2f, lowerTextViewTop,
-                                    getMeasuredWidth()*1.5f, lowerTextViewBottom);
+            RectF bottomLeftRect = new RectF(getMeasuredWidth() / 2f, lowerTextViewTop,
+                getMeasuredWidth() * 1.5f, lowerTextViewBottom);
             mSelectionPath.arcTo(bottomLeftRect, 90, 90);
             mSelectionPath.close();
         }
@@ -121,11 +121,11 @@ public class PathDrawer extends View {
             canvas.drawPath(mSelectionPath, mPathPaint);
 
             int count = mPoints.size();
-            for (int i=0; i < count; i++) {
+            for (int i = 0; i < count; i++) {
                 Point point = mPoints.get(i);
                 canvas.drawCircle(point.x, point.y, mRadius, mCirclePaint);
                 if (i > 0) {
-                    Point prevPoint = mPoints.get(i-1);
+                    Point prevPoint = mPoints.get(i - 1);
                     canvas.drawLine(prevPoint.x, prevPoint.y, point.x, point.y, mLinePaint);
                 }
             }

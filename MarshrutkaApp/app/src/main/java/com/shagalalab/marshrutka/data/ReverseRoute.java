@@ -12,7 +12,7 @@ public class ReverseRoute {
         String[] chunks = routeIdsAsStr.split(",");
         int len = chunks.length;
         routeIds = new int[len];
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             routeIds[i] = Integer.parseInt(chunks[i]);
         }
     }

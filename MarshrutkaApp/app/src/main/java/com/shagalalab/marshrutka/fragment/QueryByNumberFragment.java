@@ -27,11 +27,11 @@ public class QueryByNumberFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_query_by_number, null);
-        mListView = (ListView)view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
 
         DbHelper dbHelper = DbHelper.getInstance(getActivity());
 
-        boolean isInterfaceCyrillic = ((App)getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
+        boolean isInterfaceCyrillic = ((App) getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
         RouteAdapter adapter = new RouteAdapter(getActivity(), 0, dbHelper.routes, isInterfaceCyrillic);
         mListView.setAdapter(adapter);
         mListView.setFastScrollEnabled(true);

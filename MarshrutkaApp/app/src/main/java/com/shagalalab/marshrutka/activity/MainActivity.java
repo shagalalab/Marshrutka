@@ -2,13 +2,13 @@ package com.shagalalab.marshrutka.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,11 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.shagalalab.marshrutka.App;
+import com.shagalalab.marshrutka.R;
+import com.shagalalab.marshrutka.db.DbHelper;
 import com.shagalalab.marshrutka.fragment.QueryByDestinationsFragment;
 import com.shagalalab.marshrutka.fragment.QueryByNumberFragment;
-import com.shagalalab.marshrutka.R;
 import com.shagalalab.marshrutka.util.Utils;
-import com.shagalalab.marshrutka.db.DbHelper;
 import com.shagalalab.marshrutka.widget.SlidingTabLayout;
 
 
@@ -50,17 +50,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
 
-        ((App)getApplicationContext()).changeLocaleIfNeeded();
+        ((App) getApplicationContext()).changeLocaleIfNeeded();
 
         setContentView(R.layout.activity_main);
 
-        TAB_NAMES = new String[] {
-                getString(R.string.tab_text_numero_sign),
-                getString(R.string.tab_text_from_to)
+        TAB_NAMES = new String[]{
+            getString(R.string.tab_text_numero_sign),
+            getString(R.string.tab_text_from_to)
         };
 
         // Set up toolbar.
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the three
@@ -71,13 +71,9 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        final SlidingTabLayout slidingTabLayout =
-                (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        final SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         slidingTabLayout.setCustomTabView(R.layout.tab_indicator, android.R.id.text1);
-
-        Resources res = getResources();
-        slidingTabLayout.setSelectedIndicatorColors(
-                res.getColor(R.color.tab_selected_strip));
+        slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.tab_selected_strip));
         slidingTabLayout.setDistributeEvenly(true);
         slidingTabLayout.setViewPager(mViewPager);
     }
@@ -141,17 +137,17 @@ public class MainActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         static final int QUERY_BY_NUMBER_FRAGMENT = 0;
         static final int QUERY_BY_DESTINATION_FRAGMENT = 1;
         Fragment[] fragments;
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragments = new Fragment[] {
-                    new QueryByNumberFragment(),
-                    new QueryByDestinationsFragment()
+            fragments = new Fragment[]{
+                new QueryByNumberFragment(),
+                new QueryByDestinationsFragment()
             };
         }
 

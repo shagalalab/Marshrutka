@@ -50,18 +50,18 @@ public class QueryByDestinationsFragment extends Fragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
 
         mDbHelper = DbHelper.getInstance(getActivity());
-        mIsInterfaceCyrillic = ((App)getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
+        mIsInterfaceCyrillic = ((App) getActivity().getApplicationContext()).isCurrentLocaleCyrillic();
 
-        mStartDestinationPoints = new ArrayList<DestinationPoint>(Arrays.asList(mDbHelper.destinationPoints));
+        mStartDestinationPoints = new ArrayList<>(Arrays.asList(mDbHelper.destinationPoints));
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
-                                                                       : DestinationPoint.QQ_LAT_COMPARATOR;
+            : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(mStartDestinationPoints, comparator);
 
         mStartPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_start_point);
         mEndPoint = (AutoCompleteTextView) view.findViewById(R.id.spinner_end_point);
 
         DestinationPointAdapter startPointAdapter = new DestinationPointAdapter(getActivity(),
-                0, mStartDestinationPoints);
+            0, mStartDestinationPoints);
 
         mStartPoint.setAdapter(startPointAdapter);
         mStartPoint.setThreshold(1);
@@ -84,7 +84,7 @@ public class QueryByDestinationsFragment extends Fragment {
                 } else {
                     mEndDestinationPoints = getDestinationListFromArray(mDbHelper.reachableDestinations[destinationID].reachableDestinationIds);
                     DestinationPointAdapter endPointAdapter = new DestinationPointAdapter(getActivity(),
-                            0, mEndDestinationPoints);
+                        0, mEndDestinationPoints);
                     mEndPoint.setAdapter(endPointAdapter);
                     setListAdapter();
                 }
@@ -201,7 +201,7 @@ public class QueryByDestinationsFragment extends Fragment {
             routeIds = mDbHelper.reverseRoutes[startPointID].routeIds;
         } else {
             routeIds = mergeRoutes(mDbHelper.reverseRoutes[startPointID].routeIds,
-                                   mDbHelper.reverseRoutes[endPointID].routeIds);
+                mDbHelper.reverseRoutes[endPointID].routeIds);
         }
         int routesCount = routeIds.length;
         final Route[] filteredRoutes = new Route[routesCount];
@@ -219,11 +219,11 @@ public class QueryByDestinationsFragment extends Fragment {
                 if (startPointID == null && endPointID == null) {
                     chosenDestinationInterval = null;
                 } else if (startPointID == null) {
-                    chosenDestinationInterval = new int[] {endPointID};
+                    chosenDestinationInterval = new int[]{endPointID};
                 } else if (endPointID == null) {
-                    chosenDestinationInterval = new int[] {startPointID};
+                    chosenDestinationInterval = new int[]{startPointID};
                 } else {
-                    chosenDestinationInterval = new int[] {startPointID, endPointID};
+                    chosenDestinationInterval = new int[]{startPointID, endPointID};
                 }
                 if (chosenDestinationInterval != null) {
                     intent.putExtra(DetailActivity.CHOSEN_DESTINATIONS_INTERVAL, chosenDestinationInterval);
@@ -239,7 +239,7 @@ public class QueryByDestinationsFragment extends Fragment {
             destinationPointList.add(mDbHelper.destinationPoints[destId]);
         }
         Comparator<DestinationPoint> comparator = mIsInterfaceCyrillic ? DestinationPoint.QQ_CYR_COMPARATOR
-                : DestinationPoint.QQ_LAT_COMPARATOR;
+            : DestinationPoint.QQ_LAT_COMPARATOR;
         Collections.sort(destinationPointList, comparator);
         return destinationPointList;
     }

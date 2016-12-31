@@ -25,7 +25,7 @@ public class App extends Application {
     public void changeLocaleIfNeeded() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String uiInterface = prefs.getString(getString(R.string.pref_interface_key),
-                getString(R.string.pref_interface_default));
+            getString(R.string.pref_interface_default));
 
         Locale locale;
         if (uiInterface.equals(getString(R.string.pref_interface_default))) {
@@ -38,7 +38,7 @@ public class App extends Application {
         Configuration config = getResources().getConfiguration();
         config.locale = locale;
         getResources().updateConfiguration(config,
-                getResources().getDisplayMetrics());
+            getResources().getDisplayMetrics());
     }
 
     public boolean isCurrentLocaleCyrillic() {

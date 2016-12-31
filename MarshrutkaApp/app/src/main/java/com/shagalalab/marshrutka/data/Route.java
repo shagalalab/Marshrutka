@@ -12,7 +12,8 @@ public class Route {
     public String descriptionCyr, descriptionLat;
     public ArrayList<DestinationPoint> pathPoints;
 
-    public Route() {}
+    public Route() {
+    }
 
     public Route(boolean isBus,
                  int displayNo,

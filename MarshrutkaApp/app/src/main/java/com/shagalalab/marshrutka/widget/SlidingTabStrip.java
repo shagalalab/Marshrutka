@@ -63,7 +63,7 @@ class SlidingTabStrip extends LinearLayout {
         final int themeForegroundColor = outValue.data;
 
         mDefaultBottomBorderColor = setColorAlpha(themeForegroundColor,
-                DEFAULT_BOTTOM_BORDER_COLOR_ALPHA);
+            DEFAULT_BOTTOM_BORDER_COLOR_ALPHA);
 
         mDefaultTabColorizer = new SimpleTabColorizer();
         mDefaultTabColorizer.setIndicatorColors(DEFAULT_SELECTED_INDICATOR_COLOR);
@@ -99,8 +99,8 @@ class SlidingTabStrip extends LinearLayout {
         final int height = getHeight();
         final int childCount = getChildCount();
         final SlidingTabLayout.TabColorizer tabColorizer = mCustomTabColorizer != null
-                ? mCustomTabColorizer
-                : mDefaultTabColorizer;
+            ? mCustomTabColorizer
+            : mDefaultTabColorizer;
 
         // Thick colored underline below the current selection
         if (childCount > 0) {
@@ -118,15 +118,15 @@ class SlidingTabStrip extends LinearLayout {
                 // Draw the selection partway between the tabs
                 View nextTitle = getChildAt(mSelectedPosition + 1);
                 left = (int) (mSelectionOffset * nextTitle.getLeft() +
-                        (1.0f - mSelectionOffset) * left);
+                    (1.0f - mSelectionOffset) * left);
                 right = (int) (mSelectionOffset * nextTitle.getRight() +
-                        (1.0f - mSelectionOffset) * right);
+                    (1.0f - mSelectionOffset) * right);
             }
 
             mSelectedIndicatorPaint.setColor(color);
 
             canvas.drawRect(left, height - mSelectedIndicatorThickness, right,
-                    height, mSelectedIndicatorPaint);
+                height, mSelectedIndicatorPaint);
         }
 
         // Thin underline along the entire bottom edge

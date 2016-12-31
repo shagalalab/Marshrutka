@@ -19,7 +19,7 @@ import com.shagalalab.marshrutka.widget.AppCompatPreferenceActivity;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity
-        implements Preference.OnPreferenceChangeListener {
+    implements Preference.OnPreferenceChangeListener {
 
     private static final String TAG = "marshrutka";
 
@@ -56,9 +56,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         // Trigger the listener immediately with the preference's
         // current value.
         onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
+            PreferenceManager
+                .getDefaultSharedPreferences(preference.getContext())
+                .getString(preference.getKey(), ""));
 
         mBindingPreference = false;
     }

@@ -31,9 +31,9 @@ public class RouteAdapter extends ArrayAdapter<Route> implements SectionIndexer 
         mIsInterfaceCyrillic = isInterfaceCyrillic;
 
         int len = objects.length;
-        sectionIndexer = new LinkedHashMap<String, Integer>();
+        sectionIndexer = new LinkedHashMap<>();
         mBusShortenedLabel = context.getString(R.string.bus_shortened_label);
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             Route current = objects[i];
             if (current.isBus) {
                 if (current.displayNo == 1) {
@@ -46,7 +46,7 @@ public class RouteAdapter extends ArrayAdapter<Route> implements SectionIndexer 
             }
         }
         sections = new String[sectionIndexer.size()];
-        sections = new ArrayList<String>(sectionIndexer.keySet()).toArray(sections);
+        sections = new ArrayList<>(sectionIndexer.keySet()).toArray(sections);
     }
 
     @Override
@@ -71,11 +71,11 @@ public class RouteAdapter extends ArrayAdapter<Route> implements SectionIndexer 
         String description = route.getDescription(mIsInterfaceCyrillic);
         String[] descriptionChunks = description.split(" - ");
         int chunksLength = descriptionChunks.length;
-        for (int i=0; i<chunksLength; i++) {
+        for (int i = 0; i < chunksLength; i++) {
             holder.points[i].setVisibility(View.VISIBLE);
             holder.points[i].setText(descriptionChunks[i]);
         }
-        for (int i=chunksLength; i<5; i++) {
+        for (int i = chunksLength; i < 5; i++) {
             holder.points[i].setVisibility(View.GONE);
         }
         return convertView;

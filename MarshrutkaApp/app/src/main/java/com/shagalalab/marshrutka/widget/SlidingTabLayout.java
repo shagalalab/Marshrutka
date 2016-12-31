@@ -21,7 +21,6 @@ package com.shagalalab.marshrutka.widget;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -172,11 +171,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
         textView.setTypeface(Typeface.DEFAULT_BOLD);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         TypedValue outValue = new TypedValue();
         getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
-                outValue, true);
+            outValue, true);
         textView.setBackgroundResource(outValue.resourceId);
         textView.setText(textView.getText().toString().toUpperCase());
 
@@ -197,7 +196,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mTabViewLayoutId != 0) {
                 // If there is a custom tab view layout ID set, try and inflate it
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
-                        false);
+                    false);
                 tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
             }
 
@@ -275,13 +274,13 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
             View selectedTitle = mTabStrip.getChildAt(position);
             int extraOffset = (selectedTitle != null)
-                    ? (int) (positionOffset * selectedTitle.getWidth())
-                    : 0;
+                ? (int) (positionOffset * selectedTitle.getWidth())
+                : 0;
             scrollToTab(position, extraOffset);
 
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageScrolled(position, positionOffset,
-                        positionOffsetPixels);
+                    positionOffsetPixels);
             }
         }
 

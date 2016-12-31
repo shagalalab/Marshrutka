@@ -12,7 +12,7 @@ public class ReachableDestinations {
         String[] chunks = destinationIdsAsStr.split(",");
         int len = chunks.length;
         reachableDestinationIds = new int[len];
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             reachableDestinationIds[i] = Integer.parseInt(chunks[i]);
         }
     }
